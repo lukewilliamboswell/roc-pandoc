@@ -84,7 +84,7 @@ Block : [
     Plain (List Inline),
     Para (List Inline),
     LineBlock (List (List Inline)),
-    #CodeBlock Attr Str,
+    CodeBlock Attr Str,
     #RawBlock Format Str,
     #BlockQuote (List Block),
     #OrderedList ListAttributes (List (List Block)),
@@ -123,7 +123,11 @@ encodeBlock = \block ->
                 {"t":"LineBlock","c":[$(str)]}
                 """
 
-        #CodeBlock _ _ -> "TODO"
+        CodeBlock attrs contents ->
+            """
+            {"t":"CodeBlock","c":[$(encodeAttr attrs),"$(contents)"]}
+            """
+
         #RawBlock _ _ -> "TODO"
         #BlockQuote _ -> "TODO"
         #OrderedList _ _ -> "TODO"
