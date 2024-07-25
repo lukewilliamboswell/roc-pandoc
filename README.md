@@ -5,9 +5,9 @@ A [roc](https://www.roc-lang.org) package for generating [pandoc](https://pandoc
 This package provides the pandoc AST primitives encoding to JSON.
 
 ```
-+-----+     +------+     +-------+
-| ROC |---->| JSON |---->| PANDOC|
-+-----+     +------+     +-------+
+  +-----+     +------+     +--------+
+  | ROC |---->| JSON |---->| PANDOC |
+  +-----+     +------+     +--------+
 ```
 
 **Status** Work In Progress 🚧
