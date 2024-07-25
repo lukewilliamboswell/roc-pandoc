@@ -15,11 +15,7 @@ encode = \pandoc ->
     metaStr = pandoc.meta |> encodeMetaValueDict
 
     """
-    {
-      "pandoc-api-version": [1, 23, 1],
-      "meta": $(metaStr),
-      "blocks": [$(blocksStr)]
-    }
+    {"pandoc-api-version":[1,23,1],"meta":$(metaStr),"blocks":[$(blocksStr)]}
     """
 
 MetaValue : [
@@ -40,9 +36,10 @@ encodeMetaValueDict = \map ->
         |> Dict.toList
         |> List.map \(key, value) ->
             """
-            {"$(key)":$(encodeMetaValue value)}
+            "$(key)":$(encodeMetaValue value)
             """
         |> Str.joinWith ","
+        |> \str ->"{$(str)}"
 
 encodeMetaValue : MetaValue -> Str
 encodeMetaValue = \mv ->
@@ -59,11 +56,11 @@ encodeMetaValue = \mv ->
         MetaBool bool ->
             if bool then
                 """
-                { "t": "MetaBool", "c": true }
+                {"t":"MetaBool","c":true}
                 """
             else
                 """
-                { "t": "MetaBool", "c": false }
+                {"t":"MetaBool","c":false}
                 """
 
         MetaString str ->

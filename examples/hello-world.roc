@@ -11,9 +11,10 @@ main : Task {} _
 main =
 
     doc = {
-        meta: Dict.empty {},
+        meta: Dict.empty {} |> Dict.insert "isBasic" (MetaBool Bool.true),
         blocks: [
-            Plain [String "Hello", Space, String "world!"],
+            Header 1 { identifier: "first", classes: [], attributes: [] } [String "Hello"],
+            Para [String "world"],
         ],
     }
 

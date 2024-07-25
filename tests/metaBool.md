@@ -1,0 +1,4 @@
+---
+isCool: true
+isNotCool: false
+---
