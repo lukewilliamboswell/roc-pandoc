@@ -1,3 +1,5 @@
 examples/hello-world
+examples/fruit-basket
+examples/kitchen-sink
 
 .DS_Store
