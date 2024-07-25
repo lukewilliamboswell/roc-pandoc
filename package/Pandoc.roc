@@ -87,7 +87,7 @@ Block : [
     CodeBlock Attr Str,
     #RawBlock Format Str,
     #BlockQuote (List Block),
-    #OrderedList ListAttributes (List (List Block)),
+    OrderedList ListAttributes (List (List Block)),
     #BulletList (List (List Block)),
     #DefinitionList (List (List Inline, List Block)),
     Header I32 Attr (List Inline),
@@ -130,7 +130,26 @@ encodeBlock = \block ->
 
         #RawBlock _ _ -> "TODO"
         #BlockQuote _ -> "TODO"
-        #OrderedList _ _ -> "TODO"
+        OrderedList listAttrs listBlockList ->
+
+            encodeBlockList : List Block, List Str -> List Str
+            encodeBlockList = \blocks, acc ->
+                when blocks is
+                    [] -> acc
+                    [first, .. as rest] -> encodeBlockList rest (List.append acc (encodeBlock first))
+
+            lblStr : Str
+            lblStr =
+                listBlockList
+                |> List.map \blocks ->
+                    blocks
+                    |> encodeBlockList  []
+                    |> Str.joinWith ","
+                    |> \str -> "[$(str)]"
+                |> Str.joinWith ","
+
+            "{\"t\":\"OrderedList\",\"c\":[$(encodeListAttributes listAttrs),[$(lblStr)]]}"
+
         #BulletList _ -> "TODO"
         #DefinitionList _ -> "TODO"
         Header level attrs inlines ->
@@ -207,9 +226,49 @@ Inline : [
     #Span Attr (List Inline),
 ]
 
-# TODO List
 #Format : {}
-#ListAttributes : {}
+
+ListAttributes : {
+    start : I32,
+    style : [
+        DefaultStyle,
+        Example,
+        Decimal,
+        LowerRoman,
+        UpperRoman,
+        LowerAlpha,
+        UpperAlpha,
+    ],
+    delim : [
+        DefaultDelim,
+        Period,
+        OneParen,
+        TwoParens,
+    ],
+}
+
+encodeListAttributes : ListAttributes -> Str
+encodeListAttributes = \{start, style, delim} ->
+
+    styleStr =
+        when style is
+            DefaultStyle -> "{\"t\":\"DefaultStyle\"}"
+            Example -> "{\"t\":\"Example\"}"
+            Decimal -> "{\"t\":\"Decimal\"}"
+            LowerRoman -> "{\"t\":\"LowerRoman\"}"
+            UpperRoman -> "{\"t\":\"UpperRoman\"}"
+            LowerAlpha -> "{\"t\":\"LowerAlpha\"}"
+            UpperAlpha -> "{\"t\":\"UpperAlpha\"}"
+
+    delimStr =
+        when delim is
+            DefaultDelim -> "{\"t\":\"DefaultDelim\"}"
+            Period -> "{\"t\":\"Period\"}"
+            OneParen -> "{\"t\":\"OneParen\"}"
+            TwoParens -> "{\"t\":\"TwoParens\"}"
+
+    "[$(Num.toStr start),$(styleStr),$(delimStr)]"
+
 #Caption : {}
 #QuoteType : {}
 #Citation : {}
