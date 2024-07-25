@@ -2,9 +2,15 @@
 
 A [roc](https://www.roc-lang.org) package for generating [pandoc](https://pandoc.org) documents.
 
-This package provides the pandoc AST primitives and a function to encode as JSON.
+This package provides the pandoc AST primitives encoding to JSON.
 
-**Status**
+```
++-----+     +------+     +-------+
+| ROC |---->| JSON |---->| PANDOC|
++-----+     +------+     +-------+
+```
+
+**Status** Work In Progress 🚧
 
 - [x] Document metadata
 - [ ] Blocks
@@ -44,7 +50,6 @@ This package provides the pandoc AST primitives and a function to encode as JSON
   - [ ] Image: alt text (list of inlines), target
   - [ ] Footnote or endnote
   - [ ] Generic inline container with attributes
-
 
 ## Example
 
