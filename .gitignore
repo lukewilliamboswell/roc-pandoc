@@ -2,3 +2,7 @@
 examples/hello-world
 
 .DS_Store
+
+out.json
+out.docx
+out.html
