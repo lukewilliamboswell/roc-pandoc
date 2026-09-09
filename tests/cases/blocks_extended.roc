@@ -19,6 +19,6 @@ main! = |_args| {
 			Pandoc.Block.Div(Pandoc.Attr.{ identifier: "section", classes: [], attributes: [] }, [plain]),
 		],
 	}
-	echo!(document.to_json())
+	echo!(Json.to_str(document))
 	Ok({})
 }

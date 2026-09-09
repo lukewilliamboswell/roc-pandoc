@@ -16,6 +16,6 @@ main! = |_args| {
 		Pandoc.Inline.Note([Pandoc.Block.Para(text)]),
 		Pandoc.Inline.Span(Pandoc.Attr.{ identifier: "mark", classes: ["highlight"], attributes: [] }, text),
 	]
-	echo!(Pandoc.Document.{ meta: Dict.empty(), blocks: [Pandoc.Block.Para(inlines)] }.to_json())
+	echo!(Json.to_str(Pandoc.Document.{ meta: Dict.empty(), blocks: [Pandoc.Block.Para(inlines)] }))
 	Ok({})
 }

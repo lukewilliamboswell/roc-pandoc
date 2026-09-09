@@ -8,6 +8,6 @@ main! = |_args| {
 		Pandoc.Block.Para([Pandoc.Inline.String("Para"), Pandoc.Inline.Space, Pandoc.Inline.String("2")]),
 	])
 	meta = Dict.empty() |> Dict.insert("abstract", abstract)
-	echo!(Pandoc.Document.{ meta, blocks: [] }.to_json())
+	echo!(Json.to_str(Pandoc.Document.{ meta, blocks: [] }))
 	Ok({})
 }

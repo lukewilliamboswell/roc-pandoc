@@ -1,5 +1,5 @@
 ## Package a small EPUB 3 ebook with metadata and an automatically generated contents page:
-## roc examples/ebook/main.roc
+## cd examples/ebook && roc main.roc
 app [main!] {
 	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.23.0-rc1/3hT3SoHZ6qbEsa9qVFLUW3547U5LeoNd1KbpqLpz4r1i.tar.zst",
 	pandoc: "../../package/main.roc",
@@ -48,5 +48,5 @@ main! = |_args| {
 		Author.paragraph("The forest closed over the road before opening suddenly onto wind and ocean."),
 	])
 		|> Author.with_meta(meta)
-	render!("examples/ebook/field-notes.epub", document.to_json(), ["--to=epub3", "--toc"])
+	render!("field-notes.epub", Json.to_str(document), ["--to=epub3", "--toc"])
 }

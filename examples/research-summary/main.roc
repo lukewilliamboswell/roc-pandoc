@@ -1,5 +1,5 @@
 ## Render citations and a comparison table using a CSL bibliography:
-## roc examples/research-summary/main.roc
+## cd examples/research-summary && roc main.roc
 app [main!] {
 	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.23.0-rc1/3hT3SoHZ6qbEsa9qVFLUW3547U5LeoNd1KbpqLpz4r1i.tar.zst",
 	pandoc: "../../package/main.roc",
@@ -42,6 +42,8 @@ row : List(Str) -> Pandoc.Row
 row = |values| Pandoc.Row.{ attr: Pandoc.Attr.empty, cells: values.map(cell) }
 
 main! = |_args| {
+	meta = Dict.empty()
+		|> Dict.insert("title", Pandoc.MetaValue.String("Functional build design: research summary"))
 	citation = Pandoc.Citation.{
 		id: "wadler1992",
 		prefix: [],
@@ -81,5 +83,6 @@ main! = |_args| {
 		]),
 		table,
 	])
-	render!("examples/research-summary/research.html", document.to_json(), ["--citeproc", "--bibliography=examples/references.bib", "--to=html5", "--standalone"])
+		|> Author.with_meta(meta)
+	render!("research.html", Json.to_str(document), ["--citeproc", "--bibliography=references.bib", "--to=html5", "--standalone"])
 }

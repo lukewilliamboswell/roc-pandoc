@@ -13,6 +13,6 @@ main! = |_args| {
 		[Pandoc.TableBody.{ attr: Pandoc.Attr.empty, row_head_columns: 0, intermediate_head: [], body: [row] }],
 		Pandoc.TableFoot.{ attr: Pandoc.Attr.empty, rows: [] },
 	)
-	echo!(Pandoc.Document.{ meta: Dict.empty(), blocks: [table] }.to_json())
+	echo!(Json.to_str(Pandoc.Document.{ meta: Dict.empty(), blocks: [table] }))
 	Ok({})
 }

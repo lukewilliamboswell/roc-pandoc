@@ -1,5 +1,5 @@
 ## Create an editable PowerPoint deck; level-one headings begin new slides:
-## roc examples/slide-deck/main.roc
+## cd examples/slide-deck && roc main.roc
 ## Swap `--to=pptx` for `--to=revealjs --standalone` to publish the same deck on the web.
 app [main!] {
 	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.23.0-rc1/3hT3SoHZ6qbEsa9qVFLUW3547U5LeoNd1KbpqLpz4r1i.tar.zst",
@@ -52,5 +52,5 @@ main! = |_args| {
 		Author.paragraph_inlines([Author.strong("30 minutes"), Author.text(" from merge to a verified production release.")]),
 	])
 		|> Author.with_meta(meta)
-	render!("examples/slide-deck/demo-day.pptx", document.to_json(), ["--to=pptx", "--slide-level=1"])
+	render!("demo-day.pptx", Json.to_str(document), ["--to=pptx", "--slide-level=1"])
 }

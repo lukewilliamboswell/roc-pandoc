@@ -8,6 +8,6 @@ main! = |_args| {
 		Pandoc.MetaValue.Inlines([Pandoc.Inline.String("BAZ")]),
 	])
 	meta = Dict.empty() |> Dict.insert("author", authors)
-	echo!(Pandoc.Document.{ meta, blocks: [] }.to_json())
+	echo!(Json.to_str(Pandoc.Document.{ meta, blocks: [] }))
 	Ok({})
 }

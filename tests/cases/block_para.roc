@@ -7,6 +7,6 @@ main! = |_args| {
 		meta: Dict.empty(),
 		blocks: [Pandoc.Block.Para([Pandoc.Inline.String("foo")])],
 	}
-	echo!(document.to_json())
+	echo!(Json.to_str(document))
 	Ok({})
 }

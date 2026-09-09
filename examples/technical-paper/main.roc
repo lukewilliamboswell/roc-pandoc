@@ -1,5 +1,5 @@
 ## Produce LaTeX, or replace the final arguments with `--pdf-engine=xelatex -o paper.pdf` for PDF:
-## roc examples/technical-paper/main.roc
+## cd examples/technical-paper && roc main.roc
 app [main!] {
 	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.23.0-rc1/3hT3SoHZ6qbEsa9qVFLUW3547U5LeoNd1KbpqLpz4r1i.tar.zst",
 	pandoc: "../../package/main.roc",
@@ -48,5 +48,5 @@ main! = |_args| {
 		Author.block_quote([Author.paragraph("Variance matters more than the fastest observed build.")]),
 	])
 		|> Author.with_meta(meta)
-	render!("examples/technical-paper/paper.tex", document.to_json(), ["--to=latex", "--standalone"])
+	render!("paper.tex", Json.to_str(document), ["--to=latex", "--standalone"])
 }

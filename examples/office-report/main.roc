@@ -1,5 +1,5 @@
 ## Generate an editable Word report (use --reference-doc=brand.docx to apply a house style):
-## roc examples/office-report/main.roc
+## cd examples/office-report && roc main.roc
 app [main!] {
 	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.23.0-rc1/3hT3SoHZ6qbEsa9qVFLUW3547U5LeoNd1KbpqLpz4r1i.tar.zst",
 	pandoc: "../../package/main.roc",
@@ -51,5 +51,5 @@ main! = |_args| {
 		]),
 	])
 		|> Author.with_meta(meta)
-	render!("examples/office-report/quarterly-report.docx", document.to_json(), ["--to=docx"])
+	render!("quarterly-report.docx", Json.to_str(document), ["--to=docx"])
 }

@@ -7,6 +7,6 @@ main! = |_args| {
 		|> Dict.insert("plain", Pandoc.MetaValue.String("quotes: \" and slash: \\"))
 		|> Dict.insert("nested-key", Pandoc.MetaValue.Bool(True))
 	meta = Dict.empty() |> Dict.insert("map\"key", Pandoc.MetaValue.Map(nested))
-	echo!(Pandoc.Document.{ meta, blocks: [] }.to_json())
+	echo!(Json.to_str(Pandoc.Document.{ meta, blocks: [] }))
 	Ok({})
 }

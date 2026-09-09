@@ -1,5 +1,5 @@
 ## Build a standalone HTML product page:
-## roc examples/web-page/main.roc
+## cd examples/web-page && roc main.roc
 app [main!] {
 	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.23.0-rc1/3hT3SoHZ6qbEsa9qVFLUW3547U5LeoNd1KbpqLpz4r1i.tar.zst",
 	pandoc: "../../package/main.roc",
@@ -12,6 +12,7 @@ import cli.Path
 import cli.Stderr
 import cli.Stdout
 import pandoc.Author
+import pandoc.Pandoc
 
 render! : Str, Str, List(Str) => Try({}, _)
 render! = |output_path, json, options| {
@@ -29,6 +30,8 @@ render! = |output_path, json, options| {
 }
 
 main! = |_args| {
+	meta = Dict.empty()
+		|> Dict.insert("title", Pandoc.MetaValue.String("Acorn task manager"))
 	document = Author.document([
 		Author.heading(1, "Acorn task manager"),
 		Author.paragraph_inlines([
@@ -44,5 +47,6 @@ main! = |_args| {
 		]),
 		Author.block_quote([Author.paragraph("The boring workflow is the reliable workflow.")]),
 	])
-	render!("examples/web-page/product.html", document.to_json(), ["--to=html5", "--standalone"])
+		|> Author.with_meta(meta)
+	render!("product.html", Json.to_str(document), ["--to=html5", "--standalone"])
 }

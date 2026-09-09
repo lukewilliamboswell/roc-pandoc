@@ -17,6 +17,6 @@ main! = |_args| {
 			]),
 		],
 	}
-	echo!(document.to_json())
+	echo!(Json.to_str(document))
 	Ok({})
 }
