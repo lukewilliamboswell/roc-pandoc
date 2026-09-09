@@ -36,7 +36,7 @@ main! = |args| {
 			}
 		}
 
-	Render.html_and_open!("roc-release-notes", document.to_json())?
+	Render.html_and_open!("roc-release-notes", Json.to_str(document))?
 	Ok({})
 }
 

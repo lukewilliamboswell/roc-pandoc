@@ -5,7 +5,7 @@ import pandoc.Pandoc
 main! = |_args| {
 	document = Pandoc.Document.{
 		meta: Dict.empty(),
-		blocks: [Pandoc.Block.Para([Pandoc.Inline.String("foo")])],
+		blocks: [Pandoc.Block.Plain([Pandoc.Inline.String("plain"), Pandoc.Inline.Space, Pandoc.Inline.String("text")])],
 	}
 	echo!(Json.to_str(document))
 	Ok({})

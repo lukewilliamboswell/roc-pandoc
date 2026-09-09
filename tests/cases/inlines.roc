@@ -10,6 +10,6 @@ main! = |_args| {
 		Pandoc.Block.Para([Pandoc.Inline.Subscript([Pandoc.Inline.String("subscripted")]), Pandoc.Inline.SoftBreak, Pandoc.Inline.SmallCaps([Pandoc.Inline.String("smallcaps")])]),
 	]
 	document = Pandoc.Document.{ meta: Dict.empty(), blocks }
-	echo!(document.to_json())
+	echo!(Json.to_str(document))
 	Ok({})
 }

@@ -36,7 +36,7 @@ main! = |args| {
 			Err(problem) => Pandoc.Document.{ meta: Dict.empty(), blocks: [Pandoc.Block.Para([Pandoc.Inline.String("Invalid reading list: ${Str.inspect(problem)}")])] }
 		}
 
-	Render.html_and_open!("roc-influences", document.to_json())?
+	Render.html_and_open!("roc-influences", Json.to_str(document))?
 	Ok({})
 }
 

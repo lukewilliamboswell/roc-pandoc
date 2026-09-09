@@ -10,6 +10,6 @@ main! = |_args| {
 		[Pandoc.Block.Plain([Pandoc.Inline.String("three")])],
 	]
 	document = Pandoc.Document.{ meta: Dict.empty(), blocks: [Pandoc.Block.OrderedList(attributes, items)] }
-	echo!(document.to_json())
+	echo!(Json.to_str(document))
 	Ok({})
 }

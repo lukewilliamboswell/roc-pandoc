@@ -15,5 +15,5 @@ main! = |_args| {
 			Pandoc.Block.Para([Pandoc.Inline.String("world")]),
 		],
 	}
-	Stdout.line!(document.to_json())
+	Stdout.line!(Json.to_str(document))
 }

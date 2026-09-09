@@ -12,6 +12,6 @@ main! = |_args| {
 		meta: Dict.empty(),
 		blocks: [Pandoc.Block.CodeBlock(attributes, "bar")],
 	}
-	echo!(document.to_json())
+	echo!(Json.to_str(document))
 	Ok({})
 }
