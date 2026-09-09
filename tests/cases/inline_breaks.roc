@@ -1,0 +1,22 @@
+app [main!] { pandoc: "../../package/main.roc", roc: "nightly-2026-09-08-39a3f89" }
+
+import pandoc.Pandoc
+
+main! = |_args| {
+	document = Pandoc.Document.{
+		meta: Dict.empty(),
+		blocks: [
+			Pandoc.Block.Para([
+				Pandoc.Inline.String("first"),
+				Pandoc.Inline.Space,
+				Pandoc.Inline.String("line"),
+				Pandoc.Inline.LineBreak,
+				Pandoc.Inline.String("second"),
+				Pandoc.Inline.SoftBreak,
+				Pandoc.Inline.String("third"),
+			]),
+		],
+	}
+	echo!(document.to_json())
+	Ok({})
+}

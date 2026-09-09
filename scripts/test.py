@@ -97,6 +97,13 @@ def main() -> int:
 		print(f"error: no Roc test apps found in {CASES}", file=sys.stderr)
 		return 2
 
+	case_names = {source.stem for source in sources}
+	orphaned = sorted(path for path in GOLDENS.glob("*.json") if path.stem not in case_names)
+	if orphaned:
+		for path in orphaned:
+			print(f"error: orphaned golden without a test case: {path.relative_to(ROOT)}", file=sys.stderr)
+		return 2
+
 	with concurrent.futures.ThreadPoolExecutor(max_workers=max(args.jobs, 1)) as pool:
 		results = list(pool.map(lambda source: run_case(source, pandoc), sources))
 
