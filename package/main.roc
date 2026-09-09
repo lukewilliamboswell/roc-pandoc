@@ -1,5 +1,2 @@
-## Generate Pandoc JSON AST
-## Inspired by [elliottslaughter/rust-pandoc-types](https://github.com/elliottslaughter/rust-pandoc-types)
-package [
-    Pandoc,
-] {}
+## Generate Pandoc JSON documents using Roc's statically dispatched encoders.
+package [Pandoc] { roc: "nightly-2026-09-08-39a3f89" }

@@ -1,21 +1,19 @@
-app [main] {
-    cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.12.0/Lb8EgiejTUzbggO2HVVuPJFkwvvsfW6LojkLR20kTVE.tar.br",
-    pandoc: "../package/main.roc",
+app [main!] {
+	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.22.0/F1JVZPYfWP71s8vk6tHcV1Qx1Ef6CZkwswGoCn8VHZmL.tar.zst",
+	roc: "nightly-2026-09-08-39a3f89",
+	pandoc: "../package/main.roc",
 }
 
 import cli.Stdout
-import cli.Task exposing [Task]
 import pandoc.Pandoc
 
-main : Task {} _
-main =
-
-    doc = {
-        meta: Dict.empty {} |> Dict.insert "isBasic" (MetaBool Bool.true),
-        blocks: [
-            Header 1 { identifier: "first", classes: [], attributes: [] } [String "Hello"],
-            Para [String "world"],
-        ],
-    }
-
-    Stdout.write! (Pandoc.encode doc)
+main! = |_args| {
+	document = Pandoc.Document.{
+		meta: Dict.empty() |> Dict.insert("isBasic", Pandoc.MetaValue.Bool(True)),
+		blocks: [
+			Pandoc.Block.Header(1, Pandoc.Attr.{ identifier: "first", classes: [], attributes: [] }, [Pandoc.Inline.String("Hello")]),
+			Pandoc.Block.Para([Pandoc.Inline.String("world")]),
+		],
+	}
+	Stdout.line!(document.to_json())
+}
