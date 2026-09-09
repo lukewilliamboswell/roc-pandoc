@@ -143,6 +143,7 @@ jobs:
     environment: release
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -167,4 +168,21 @@ jobs:
         uses: roc-lang/release-package/actions/publish-release@af2f0cd8662874b825ff3917f4286e793ba18c55
         with:
           release_version: ${{ needs.build.outputs.release_version }}
+          github_token: ${{ github.token }}
+      - name: Pin examples to the published bundle
+        run: python3 scripts/update_example_package_pins.py --release-version "$RELEASE_VERSION" --release-list-file .release/release-bundles.json --repository "$GITHUB_REPOSITORY"
+        env:
+          RELEASE_VERSION: ${{ needs.build.outputs.release_version }}
+      - name: Validate released examples
+        run: python3 scripts/all_tests.py
+      - name: Open example pin follow-up PR
+        uses: roc-lang/release-package/actions/create-followup-pr@af2f0cd8662874b825ff3917f4286e793ba18c55
+        with:
+          release_version: ${{ needs.build.outputs.release_version }}
+          paths: examples
+          branch_prefix: release-followup
+          base_branch: ${{ github.event.repository.default_branch }}
+          commit_message: Pin examples to roc-pandoc ${{ needs.build.outputs.release_version }}
+          pr_title: Pin examples to roc-pandoc ${{ needs.build.outputs.release_version }}
+          pr_body: Updates every example app to consume the immutable bundle published in roc-pandoc ${{ needs.build.outputs.release_version }}.
           github_token: ${{ github.token }}
