@@ -26,4 +26,7 @@ jobs:
           version: nightly-new-compiler
           nightly-tag: nightly-2026-09-08-39a3f89
       - run: roc version
-      - run: ./run-tests.sh
+      - name: Install Pandoc
+        run: sudo apt-get update && sudo apt-get install --yes pandoc
+      - run: pandoc --version
+      - run: python3 scripts/all_tests.py

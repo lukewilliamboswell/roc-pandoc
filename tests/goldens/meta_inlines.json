@@ -1,0 +1,1 @@
+{"pandoc-api-version":[1,23,1],"meta":{"title":{"t":"MetaInlines","c":[{"t":"Str","c":"Foo"},{"t":"Space"},{"t":"Emph","c":[{"t":"Str","c":"bar"}]}]}},"blocks":[]}

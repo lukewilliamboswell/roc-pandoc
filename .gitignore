@@ -6,3 +6,6 @@ examples/hello-world
 out.json
 out.docx
 out.html
+
+__pycache__/
+*.py[cod]

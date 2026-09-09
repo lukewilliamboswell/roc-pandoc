@@ -1,7 +1,19 @@
-## Types and JSON encoding for the Pandoc abstract syntax tree.
+## Construct a type-safe subset of the Pandoc abstract syntax tree and encode it
+## as Pandoc JSON.
+##
+## Build a `Document` from `Block` and `Inline` values, then call
+## `document.to_json()` (or `Pandoc.to_json(document)`). Strings, metadata keys,
+## identifiers, classes, and attribute pairs are JSON-escaped automatically.
 Pandoc := [].{
 
-	## A complete Pandoc document.
+	## A complete Pandoc document containing metadata and block-level content.
+	##
+	## ```roc
+	## document = Pandoc.Document.{
+	##     meta: Dict.empty(),
+	##     blocks: [Pandoc.Block.Para([Pandoc.Inline.String("Hello")])],
+	## }
+	## ```
 	Document := { blocks : List(Block), meta : Dict(Str, MetaValue) }.{
 
 		## Encode this document to Pandoc's JSON format.
@@ -9,30 +21,86 @@ Pandoc := [].{
 		to_json = |document| document_to_json(document)
 	}
 
+	## A value in a document's metadata map.
+	##
+	## `Map` recursively contains metadata, while `Inlines` and `Blocks` allow
+	## formatted Pandoc content in metadata fields such as titles and abstracts.
+	##
+	## ```roc
+	## title = Pandoc.MetaValue.Inlines([
+	##     Pandoc.Inline.Strong([Pandoc.Inline.String("Roc and Pandoc")]),
+	## ])
+	## ```
 	MetaValue := [Map(Dict(Str, MetaValue)), List(List(MetaValue)), Bool(Bool), String(Str), Inlines(List(Inline)), Blocks(List(Block))].{
+
+		## Encode this metadata value as a Pandoc JSON value.
 		to_json : MetaValue -> Str
 		to_json = |value| meta_to_json(value)
 	}
 
+	## Block-level document content.
+	##
+	## An `OrderedList` contains a list of items, where every item is itself a
+	## list of blocks. The integer passed to `Header` is its heading level.
+	##
+	## ```roc
+	## heading = Pandoc.Block.Header(
+	##     2,
+	##     Pandoc.Attr.empty,
+	##     [Pandoc.Inline.String("Details")],
+	## )
+	## ```
 	Block := [Plain(List(Inline)), Para(List(Inline)), LineBlock(List(List(Inline))), CodeBlock(Attr, Str), OrderedList(ListAttributes, List(List(Block))), Header(I32, Attr, List(Inline))].{
+
+		## Encode this block as a Pandoc JSON value.
 		to_json : Block -> Str
 		to_json = |block| block_to_json(block)
 	}
 
+	## Inline text and formatting within a block.
+	##
+	## Formatting constructors contain more inline values and can therefore be
+	## nested. Use `Space`, `SoftBreak`, and `LineBreak` rather than embedding
+	## those layout choices in `String` values.
+	##
+	## ```roc
+	## greeting = [
+	##     Pandoc.Inline.Strong([Pandoc.Inline.String("Hello")]),
+	##     Pandoc.Inline.Space,
+	##     Pandoc.Inline.String("world"),
+	## ]
+	## ```
 	Inline := [String(Str), Emph(List(Inline)), Underline(List(Inline)), Strong(List(Inline)), Strikeout(List(Inline)), Superscript(List(Inline)), Subscript(List(Inline)), SmallCaps(List(Inline)), Space, SoftBreak, LineBreak].{
+
+		## Encode this inline as a Pandoc JSON value.
 		to_json : Inline -> Str
 		to_json = |inline| inline_to_json(inline)
 	}
 
+	## An element identifier, CSS-style classes, and key-value attributes.
+	##
+	## ```roc
+	## attr = Pandoc.Attr.{
+	##     identifier: "example",
+	##     classes: ["highlight"],
+	##     attributes: [("lang", "roc")],
+	## }
+	## ```
 	Attr := { identifier : Str, classes : List(Str), attributes : List((Str, Str)) }.{
+
+		## Attributes with no identifier, classes, or key-value pairs.
 		empty : Attr
 		empty = { identifier: "", classes: [], attributes: [] }
 
+		## Encode these attributes as a Pandoc JSON value.
 		to_json : Attr -> Str
 		to_json = |attr| attr_to_json(attr)
 	}
 
+	## Numbering style for an ordered list.
 	ListStyle := [DefaultStyle, Example, Decimal, LowerRoman, UpperRoman, LowerAlpha, UpperAlpha].{
+
+		## Encode this list style as a Pandoc JSON value.
 		to_json : ListStyle -> Str
 		to_json = |style| bare_tag(
 			match style {
@@ -47,7 +115,10 @@ Pandoc := [].{
 		)
 	}
 
+	## Punctuation surrounding an ordered-list marker.
 	ListDelimiter := [DefaultDelim, Period, OneParen, TwoParens].{
+
+		## Encode this list delimiter as a Pandoc JSON value.
 		to_json : ListDelimiter -> Str
 		to_json = |delimiter| bare_tag(
 			match delimiter {
@@ -59,12 +130,32 @@ Pandoc := [].{
 		)
 	}
 
+	## Starting number, numbering style, and marker punctuation for an ordered list.
+	##
+	## ```roc
+	## numbering = Pandoc.ListAttributes.{
+	##     start: 1,
+	##     style: Pandoc.ListStyle.Decimal,
+	##     delimiter: Pandoc.ListDelimiter.Period,
+	## }
+	## ```
 	ListAttributes := { start : I32, style : ListStyle, delimiter : ListDelimiter }.{
+
+		## Encode these ordered-list attributes as a Pandoc JSON value.
 		to_json : ListAttributes -> Str
 		to_json = |attributes| "[${attributes.start.to_str()},${attributes.style.to_json()},${attributes.delimiter.to_json()}]"
 	}
 
-	## Convenience alias for `Document.to_json`.
+	## Encode a complete document as Pandoc JSON.
+	##
+	## This is the explicit equivalent of `document.to_json()`.
+	##
+	## ```roc
+	## json = Pandoc.to_json(Pandoc.Document.{
+	##     meta: Dict.empty(),
+	##     blocks: [],
+	## })
+	## ```
 	to_json : Document -> Str
 	to_json = |document| document.to_json()
 
