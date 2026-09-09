@@ -98,6 +98,8 @@ def run_workflow_examples() -> int:
 
 
 def main() -> int:
+	if run([sys.executable, "scripts/test_update_example_package_pins.py"]):
+		return 1
 	if run([ROC, "fmt", "--check", "package", "examples", "tests/cases"]):
 		return 1
 	if run([ROC, "check", "package/main.roc", "--no-cache"]):
