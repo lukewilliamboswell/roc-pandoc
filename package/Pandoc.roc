@@ -1,429 +1,245 @@
-module [
-    Pandoc,
-    encode,
-]
+## Construct a type-safe subset of the Pandoc abstract syntax tree and encode it
+## as Pandoc JSON.
+##
+## Build a `Document` from `Block` and `Inline` values, then call
+## `document.to_json()` (or `Pandoc.to_json(document)`). Strings, metadata keys,
+## identifiers, classes, and attribute pairs are JSON-escaped automatically.
+Pandoc := [].{
 
-Pandoc : {
-    blocks : List Block,
-    meta : Dict Str MetaValue,
+	## A complete Pandoc document containing metadata and block-level content.
+	##
+	## ```roc
+	## document = Pandoc.Document.{
+	##     meta: Dict.empty(),
+	##     blocks: [Pandoc.Block.Para([Pandoc.Inline.String("Hello")])],
+	## }
+	## ```
+	Document := { blocks : List(Block), meta : Dict(Str, MetaValue) }.{
+
+		## Encode this document to Pandoc's JSON format.
+		to_json : Document -> Str
+		to_json = |document| document_to_json(document)
+	}
+
+	## A value in a document's metadata map.
+	##
+	## `Map` recursively contains metadata, while `Inlines` and `Blocks` allow
+	## formatted Pandoc content in metadata fields such as titles and abstracts.
+	##
+	## ```roc
+	## title = Pandoc.MetaValue.Inlines([
+	##     Pandoc.Inline.Strong([Pandoc.Inline.String("Roc and Pandoc")]),
+	## ])
+	## ```
+	MetaValue := [Map(Dict(Str, MetaValue)), List(List(MetaValue)), Bool(Bool), String(Str), Inlines(List(Inline)), Blocks(List(Block))].{
+
+		## Encode this metadata value as a Pandoc JSON value.
+		to_json : MetaValue -> Str
+		to_json = |value| meta_to_json(value)
+	}
+
+	## Block-level document content.
+	##
+	## An `OrderedList` contains a list of items, where every item is itself a
+	## list of blocks. The integer passed to `Header` is its heading level.
+	##
+	## ```roc
+	## heading = Pandoc.Block.Header(
+	##     2,
+	##     Pandoc.Attr.empty,
+	##     [Pandoc.Inline.String("Details")],
+	## )
+	## ```
+	Block := [Plain(List(Inline)), Para(List(Inline)), LineBlock(List(List(Inline))), CodeBlock(Attr, Str), OrderedList(ListAttributes, List(List(Block))), Header(I32, Attr, List(Inline))].{
+
+		## Encode this block as a Pandoc JSON value.
+		to_json : Block -> Str
+		to_json = |block| block_to_json(block)
+	}
+
+	## Inline text and formatting within a block.
+	##
+	## Formatting constructors contain more inline values and can therefore be
+	## nested. Use `Space`, `SoftBreak`, and `LineBreak` rather than embedding
+	## those layout choices in `String` values.
+	##
+	## ```roc
+	## greeting = [
+	##     Pandoc.Inline.Strong([Pandoc.Inline.String("Hello")]),
+	##     Pandoc.Inline.Space,
+	##     Pandoc.Inline.String("world"),
+	## ]
+	## ```
+	Inline := [String(Str), Emph(List(Inline)), Underline(List(Inline)), Strong(List(Inline)), Strikeout(List(Inline)), Superscript(List(Inline)), Subscript(List(Inline)), SmallCaps(List(Inline)), Space, SoftBreak, LineBreak].{
+
+		## Encode this inline as a Pandoc JSON value.
+		to_json : Inline -> Str
+		to_json = |inline| inline_to_json(inline)
+	}
+
+	## An element identifier, CSS-style classes, and key-value attributes.
+	##
+	## ```roc
+	## attr = Pandoc.Attr.{
+	##     identifier: "example",
+	##     classes: ["highlight"],
+	##     attributes: [("lang", "roc")],
+	## }
+	## ```
+	Attr := { identifier : Str, classes : List(Str), attributes : List((Str, Str)) }.{
+
+		## Attributes with no identifier, classes, or key-value pairs.
+		empty : Attr
+		empty = { identifier: "", classes: [], attributes: [] }
+
+		## Encode these attributes as a Pandoc JSON value.
+		to_json : Attr -> Str
+		to_json = |attr| attr_to_json(attr)
+	}
+
+	## Numbering style for an ordered list.
+	ListStyle := [DefaultStyle, Example, Decimal, LowerRoman, UpperRoman, LowerAlpha, UpperAlpha].{
+
+		## Encode this list style as a Pandoc JSON value.
+		to_json : ListStyle -> Str
+		to_json = |style| bare_tag(
+			match style {
+				DefaultStyle => "DefaultStyle"
+				Example => "Example"
+				Decimal => "Decimal"
+				LowerRoman => "LowerRoman"
+				UpperRoman => "UpperRoman"
+				LowerAlpha => "LowerAlpha"
+				UpperAlpha => "UpperAlpha"
+			},
+		)
+	}
+
+	## Punctuation surrounding an ordered-list marker.
+	ListDelimiter := [DefaultDelim, Period, OneParen, TwoParens].{
+
+		## Encode this list delimiter as a Pandoc JSON value.
+		to_json : ListDelimiter -> Str
+		to_json = |delimiter| bare_tag(
+			match delimiter {
+				DefaultDelim => "DefaultDelim"
+				Period => "Period"
+				OneParen => "OneParen"
+				TwoParens => "TwoParens"
+			},
+		)
+	}
+
+	## Starting number, numbering style, and marker punctuation for an ordered list.
+	##
+	## ```roc
+	## numbering = Pandoc.ListAttributes.{
+	##     start: 1,
+	##     style: Pandoc.ListStyle.Decimal,
+	##     delimiter: Pandoc.ListDelimiter.Period,
+	## }
+	## ```
+	ListAttributes := { start : I32, style : ListStyle, delimiter : ListDelimiter }.{
+
+		## Encode these ordered-list attributes as a Pandoc JSON value.
+		to_json : ListAttributes -> Str
+		to_json = |attributes| "[${attributes.start.to_str()},${attributes.style.to_json()},${attributes.delimiter.to_json()}]"
+	}
+
+	## Encode a complete document as Pandoc JSON.
+	##
+	## This is the explicit equivalent of `document.to_json()`.
+	##
+	## ```roc
+	## json = Pandoc.to_json(Pandoc.Document.{
+	##     meta: Dict.empty(),
+	##     blocks: [],
+	## })
+	## ```
+	to_json : Document -> Str
+	to_json = |document| document.to_json()
+
+	document_to_json : Document -> Str
+	document_to_json = |document| {
+		metadata = Str.join_with(List.map(document.meta.to_list(), |(key, value)| "${Json.to_str(key)}:${meta_to_json(value)}"), ",")
+		blocks = Str.join_with(List.map(document.blocks, |block| block_to_json(block)), ",")
+		"{\"pandoc-api-version\":[1,23,1],\"meta\":{${metadata}},\"blocks\":[${blocks}]}"
+	}
+
+	meta_to_json : MetaValue -> Str
+	meta_to_json = |value| match value {
+		Map(map) => "{${Str.join_with(List.map(map.to_list(), |(key, item)| "${Json.to_str(key)}:${meta_to_json(item)}"), ",")}}"
+		List(items) => tagged("MetaList", "[${Str.join_with(List.map(items, |item| meta_to_json(item)), ",")}]")
+		Bool(bool) => tagged("MetaBool", Json.to_str(bool))
+		String(str) => tagged("MetaString", Json.to_str(str))
+		Inlines(inlines) => tagged("MetaInlines", inline_list_to_json(inlines))
+		Blocks(blocks) => tagged("MetaBlocks", block_list_to_json(blocks))
+	}
+
+	block_to_json : Block -> Str
+	block_to_json = |block| match block {
+		Plain(inlines) => tagged("Plain", inline_list_to_json(inlines))
+		Para(inlines) => tagged("Para", inline_list_to_json(inlines))
+		LineBlock(lines) => tagged("LineBlock", "[${Str.join_with(List.map(lines, |line| inline_list_to_json(line)), ",")}]")
+		CodeBlock(attr, contents) => tagged("CodeBlock", "[${attr_to_json(attr)},${Json.to_str(contents)}]")
+		OrderedList(attributes, items) => tagged("OrderedList", "[${attributes.to_json()},[${Str.join_with(List.map(items, |item| block_list_to_json(item)), ",")}]]")
+		Header(level, attr, inlines) => tagged("Header", "[${level.to_str()},${attr_to_json(attr)},${inline_list_to_json(inlines)}]")
+	}
+
+	inline_to_json : Inline -> Str
+	inline_to_json = |inline| match inline {
+		String(str) => tagged("Str", Json.to_str(str))
+		Emph(items) => tagged("Emph", inline_list_to_json(items))
+		Underline(items) => tagged("Underline", inline_list_to_json(items))
+		Strong(items) => tagged("Strong", inline_list_to_json(items))
+		Strikeout(items) => tagged("Strikeout", inline_list_to_json(items))
+		Superscript(items) => tagged("Superscript", inline_list_to_json(items))
+		Subscript(items) => tagged("Subscript", inline_list_to_json(items))
+		SmallCaps(items) => tagged("SmallCaps", inline_list_to_json(items))
+		Space => bare_tag("Space")
+		SoftBreak => bare_tag("SoftBreak")
+		LineBreak => bare_tag("LineBreak")
+	}
+
+	inline_list_to_json : List(Inline) -> Str
+	inline_list_to_json = |items| "[${Str.join_with(List.map(items, |item| inline_to_json(item)), ",")}]"
+	block_list_to_json : List(Block) -> Str
+	block_list_to_json = |items| "[${Str.join_with(List.map(items, |item| block_to_json(item)), ",")}]"
+
+	attr_to_json : Attr -> Str
+	attr_to_json = |attr| {
+		classes = Str.join_with(List.map(attr.classes, |class| Json.to_str(class)), ",")
+		attributes = Str.join_with(List.map(attr.attributes, |(key, value)| "[${Json.to_str(key)},${Json.to_str(value)}]"), ",")
+		"[${Json.to_str(attr.identifier)},[${classes}],[${attributes}]]"
+	}
+
+	tagged : Str, Str -> Str
+	tagged = |tag, contents| "{\"t\":${Json.to_str(tag)},\"c\":${contents}}"
+	bare_tag : Str -> Str
+	bare_tag = |tag| "{\"t\":${Json.to_str(tag)}}"
 }
 
-encode : Pandoc -> Str
-encode = \pandoc ->
+expect Pandoc.to_json(Pandoc.Document.{ meta: Dict.empty(), blocks: [] }) == "{\"pandoc-api-version\":[1,23,1],\"meta\":{},\"blocks\":[]}"
+expect Pandoc.Inline.String("quotes: \" and slash: \\").to_json() == "{\"t\":\"Str\",\"c\":\"quotes: \\\" and slash: \\\\\"}"
+expect Pandoc.Block.Header(1, Pandoc.Attr.{ identifier: "intro", classes: ["lead"], attributes: [("role", "doc")] }, [Pandoc.Inline.String("Hello")]).to_json() == "{\"t\":\"Header\",\"c\":[1,[\"intro\",[\"lead\"],[[\"role\",\"doc\"]]],[{\"t\":\"Str\",\"c\":\"Hello\"}]]}"
 
-    blocksStr = pandoc.blocks |> List.map encodeBlock |> Str.joinWith ","
-    metaStr = pandoc.meta |> encodeMetaValueDict
-
-    """
-    {"pandoc-api-version":[1,23,1],"meta":$(metaStr),"blocks":[$(blocksStr)]}
-    """
-
-MetaValue : [
-    MetaMap (Dict Str MetaValue),
-    MetaList (List MetaValue),
-    MetaBool Bool,
-    MetaString Str,
-    MetaInlines (List Inline),
-    MetaBlocks (List Block),
-]
-
-encodeMetaValueDict : Dict Str MetaValue -> Str
-encodeMetaValueDict = \map ->
-    if Dict.isEmpty map then
-        "{}"
-    else
-        map
-        |> Dict.toList
-        |> List.map \(key, value) ->
-            """
-            "$(key)":$(encodeMetaValue value)
-            """
-        |> Str.joinWith ","
-        |> \str ->"{$(str)}"
-
-encodeMetaValue : MetaValue -> Str
-encodeMetaValue = \mv ->
-    when mv is
-        MetaMap map ->
-            encodeMetaValueDict map
-
-        MetaList list ->
-            metaList = list |> List.map encodeMetaValue |> Str.joinWith ","
-            """
-            {"t":"MetaList","c":[$(metaList)]}
-            """
-
-        MetaBool bool ->
-            if bool then
-                """
-                {"t":"MetaBool","c":true}
-                """
-            else
-                """
-                {"t":"MetaBool","c":false}
-                """
-
-        MetaString str ->
-            """
-            {"t":"MetaString","c":"$(str)"}
-            """
-
-        MetaInlines inlines ->
-            inlineStr = inlines |> List.map encodeInline |> Str.joinWith ","
-            """
-            {"t":"MetaInlines","c":[$(inlineStr)]}
-            """
-
-        MetaBlocks blocks ->
-            metaBlocks = blocks |> List.map encodeBlock |> Str.joinWith ","
-            """
-            {"t":"MetaBlocks","c":[$(metaBlocks)]}
-            """
-
-Block : [
-    Plain (List Inline),
-    Para (List Inline),
-    LineBlock (List (List Inline)),
-    CodeBlock Attr Str,
-    #RawBlock Format Str,
-    #BlockQuote (List Block),
-    OrderedList ListAttributes (List (List Block)),
-    #BulletList (List (List Block)),
-    #DefinitionList (List (List Inline, List Block)),
-    Header I32 Attr (List Inline),
-    #HorizontalRule,
-    #Table,
-    #Figure Attr Caption (List Block),
-    #Div Attr (List Block),
-    #Null,
-]
-
-encodeBlock : Block -> Str
-encodeBlock = \block ->
-    when block is
-        Plain inlines ->
-            """
-            {"t":"Plain","c":[$(encodeInlineList inlines)]}
-            """
-
-        Para inlines ->
-            """
-            {"t":"Para","c":[$(encodeInlineList inlines)]}
-            """
-
-        LineBlock lines ->
-            lines
-            |> List.map \inlines ->
-                """
-                [$(encodeInlineList inlines)]
-                """
-            |> Str.joinWith ","
-            |> \str ->
-                """
-                {"t":"LineBlock","c":[$(str)]}
-                """
-
-        CodeBlock attrs contents ->
-            """
-            {"t":"CodeBlock","c":[$(encodeAttr attrs),"$(contents)"]}
-            """
-
-        #RawBlock _ _ -> "TODO"
-        #BlockQuote _ -> "TODO"
-        OrderedList listAttrs listBlockList ->
-
-            encodeBlockList : List Block, List Str -> List Str
-            encodeBlockList = \blocks, acc ->
-                when blocks is
-                    [] -> acc
-                    [first, .. as rest] -> encodeBlockList rest (List.append acc (encodeBlock first))
-
-            lblStr : Str
-            lblStr =
-                listBlockList
-                |> List.map \blocks ->
-                    blocks
-                    |> encodeBlockList  []
-                    |> Str.joinWith ","
-                    |> \str -> "[$(str)]"
-                |> Str.joinWith ","
-
-            "{\"t\":\"OrderedList\",\"c\":[$(encodeListAttributes listAttrs),[$(lblStr)]]}"
-
-        #BulletList _ -> "TODO"
-        #DefinitionList _ -> "TODO"
-        Header level attrs inlines ->
-            """
-            {"t":"Header","c":[$(Num.toStr level),$(encodeAttr attrs),[$(encodeInlineList inlines)]]}
-            """
-
-        #HorizontalRule -> "TODO"
-        #Table -> "TODO"
-        #Figure _ _ _ -> "TODO"
-        #Div _ _ -> "TODO"
-        #Null -> "TODO"
-
-Inline : [
-
-    # Text
-    String Str,
-
-    # Emphasized text
-    Emph (List Inline),
-
-    # Underlined text
-    Underline (List Inline),
-
-    # Strongly emphasized text
-    Strong (List Inline),
-
-    # Strikeout text
-    Strikeout (List Inline),
-
-    # Superscripted text
-    Superscript (List Inline),
-
-    # Subscripted text
-    Subscript (List Inline),
-
-    # Small caps text
-    SmallCaps (List Inline),
-
-    ## Quoted text
-    #Quoted QuoteType (List Inline),
-
-    ## Citation
-    #Cite (List Citation) (List Inline),
-
-    ## Inline code
-    #Code Attr Str,
-
-    # Inter-word space
-    Space,
-
-    # Soft line break
-    SoftBreak,
-
-    # Hard line break
-    LineBreak,
-
-    ## TeX math
-    #Math MathType Str,
-
-    ## Raw inline
-    #RawInline Format Str,
-
-    ## Hyperlink: alt text (list of inlines), target
-    #Link Attr (List Inline) Target,
-
-    ## Image: alt text (list of inlines), target
-    #Image Attr (List Inline) Target,
-
-    ## Footnote or endnote
-    #Note (List Block),
-
-    ## Generic inline container with attributes
-    #Span Attr (List Inline),
-]
-
-#Format : {}
-
-ListAttributes : {
-    start : I32,
-    style : [
-        DefaultStyle,
-        Example,
-        Decimal,
-        LowerRoman,
-        UpperRoman,
-        LowerAlpha,
-        UpperAlpha,
-    ],
-    delim : [
-        DefaultDelim,
-        Period,
-        OneParen,
-        TwoParens,
-    ],
+expect {
+	metadata = Dict.empty()
+		|> Dict.insert("published", Pandoc.MetaValue.Bool(True))
+		|> Dict.insert("authors", Pandoc.MetaValue.List([Pandoc.MetaValue.String("Ada")]))
+	json = Pandoc.Document.{ meta: metadata, blocks: [] }.to_json()
+	json == "{\"pandoc-api-version\":[1,23,1],\"meta\":{\"published\":{\"t\":\"MetaBool\",\"c\":true},\"authors\":{\"t\":\"MetaList\",\"c\":[{\"t\":\"MetaString\",\"c\":\"Ada\"}]}},\"blocks\":[]}"
 }
 
-encodeListAttributes : ListAttributes -> Str
-encodeListAttributes = \{start, style, delim} ->
+expect Pandoc.Block.OrderedList(
+	Pandoc.ListAttributes.{ start: 3, style: Pandoc.ListStyle.LowerRoman, delimiter: Pandoc.ListDelimiter.OneParen },
+	[[Pandoc.Block.Plain([Pandoc.Inline.String("item")])]],
+).to_json() == "{\"t\":\"OrderedList\",\"c\":[[3,{\"t\":\"LowerRoman\"},{\"t\":\"OneParen\"}],[[{\"t\":\"Plain\",\"c\":[{\"t\":\"Str\",\"c\":\"item\"}]}]]]}"
 
-    styleStr =
-        when style is
-            DefaultStyle -> "{\"t\":\"DefaultStyle\"}"
-            Example -> "{\"t\":\"Example\"}"
-            Decimal -> "{\"t\":\"Decimal\"}"
-            LowerRoman -> "{\"t\":\"LowerRoman\"}"
-            UpperRoman -> "{\"t\":\"UpperRoman\"}"
-            LowerAlpha -> "{\"t\":\"LowerAlpha\"}"
-            UpperAlpha -> "{\"t\":\"UpperAlpha\"}"
-
-    delimStr =
-        when delim is
-            DefaultDelim -> "{\"t\":\"DefaultDelim\"}"
-            Period -> "{\"t\":\"Period\"}"
-            OneParen -> "{\"t\":\"OneParen\"}"
-            TwoParens -> "{\"t\":\"TwoParens\"}"
-
-    "[$(Num.toStr start),$(styleStr),$(delimStr)]"
-
-#Caption : {}
-#QuoteType : {}
-#Citation : {}
-#MathType : {}
-#Target : {}
-
-encodeInline : Inline -> Str
-encodeInline = \inline ->
-    when inline is
-
-        # Text
-        String str ->
-            """
-            {"t":"Str","c":"$(str)"}
-            """
-
-        # Emphasized text
-        Emph inlines ->
-            """
-            {"t":"Emph","c":[$(encodeInlineList inlines)]}
-            """
-
-        # Underlined text
-        Underline inlines ->
-            """
-            {"t":"Underline","c":[$(encodeInlineList inlines)]}
-            """
-
-        # Strongly emphasized text
-        Strong inlines ->
-            """
-            {"t":"Strong","c":[$(encodeInlineList inlines)]}
-            """
-
-        # Strikeout text
-        Strikeout inlines ->
-            """
-            {"t":"Strikeout","c":[$(encodeInlineList inlines)]}
-            """
-
-        # Superscripted text
-        Superscript inlines ->
-            """
-            {"t":"Superscript","c":[$(encodeInlineList inlines)]}
-            """
-
-        # Subscripted text
-        Subscript inlines ->
-            """
-            {"t":"Subscript","c":[$(encodeInlineList inlines)]}
-            """
-
-        # Small caps text
-        SmallCaps inlines ->
-            """
-            {"t":"SmallCaps","c":[$(encodeInlineList inlines)]}
-            """
-
-        ## Quoted text
-        #Quoted _ _ -> "TODO"
-
-        ## Citation
-        #Cite _ _ -> "TODO"
-
-        ## Inline code
-        #Code _ _ -> "TODO"
-
-        # Inter-word space
-        Space ->
-            """
-            {"t":"Space"}
-            """
-
-        # Soft line break
-        SoftBreak ->
-            """
-            {"t":"SoftBreak"}
-            """
-
-        # Hard line break
-        LineBreak ->
-            """
-            {"t":"LineBreak"}
-            """
-
-        ## TeX math
-        #Math _ _ -> "TODO"
-
-        ## Raw inline
-        #RawInline _ _ -> "TODO"
-
-        ## Hyperlink: alt text (list of inlines), target
-        #Link _ _ _ -> "TODO"
-
-        ## Image: alt text (list of inlines), target
-        #Image attr inlines target -> "TODO"
-
-        ## Footnote or endnote
-        #Note blocks -> "TODO"
-
-        ## Generic inline container with attributes
-        #Span attr inlines -> "TODO"
-
-expect
-    String "foo"
-    |> encodeInline
-    ==
-    """
-    {"t":"Str","c":"foo"}
-    """
-
-expect
-    Space
-    |> encodeInline
-    ==
-    """
-    {"t":"Space"}
-    """
-
-encodeInlineList : List Inline -> Str
-encodeInlineList = \inlines -> inlines |> List.map encodeInline |> Str.joinWith ","
-
-Attr : {
-    identifier : Str,
-    classes : List Str,
-    attributes : List (Str, Str),
-}
-
-encodeAttr : Attr -> Str
-encodeAttr = \{ identifier, classes, attributes } ->
-
-    classesStr =
-        classes
-        |> List.map \class ->
-            """
-            "$(class)"
-            """
-        |> Str.joinWith ","
-
-    attributesStr =
-        attributes
-        |> List.map \(key, value) ->
-            """
-            ["$(key)","$(value)"]
-            """
-        |> Str.joinWith ","
-
-    """
-    ["$(identifier)",[$(classesStr)],[$(attributesStr)]]
-    """
-
-expect
-    Header 1 { identifier: "a", classes: ["b"], attributes: [("c", "d")] } [String "foo", Space, String "bar!"]
-    |> encodeBlock
-    ==
-    """
-    {"t":"Header","c":[1,["a",["b"],[["c","d"]]],[{"t":"Str","c":"foo"},{"t":"Space"},{"t":"Str","c":"bar!"}]]}
-    """
+expect Pandoc.Block.Para([
+	Pandoc.Inline.Emph([Pandoc.Inline.String("em")]),
+	Pandoc.Inline.Space,
+	Pandoc.Inline.Strong([Pandoc.Inline.String("strong")]),
+	Pandoc.Inline.SoftBreak,
+	Pandoc.Inline.LineBreak,
+]).to_json() == "{\"t\":\"Para\",\"c\":[{\"t\":\"Emph\",\"c\":[{\"t\":\"Str\",\"c\":\"em\"}]},{\"t\":\"Space\"},{\"t\":\"Strong\",\"c\":[{\"t\":\"Str\",\"c\":\"strong\"}]},{\"t\":\"SoftBreak\"},{\"t\":\"LineBreak\"}]}"

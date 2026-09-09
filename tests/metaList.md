@@ -1,5 +1,0 @@
----
-author:
-- BAR
-- BAZ
----

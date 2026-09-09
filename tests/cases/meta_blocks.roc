@@ -1,0 +1,13 @@
+app [main!] { pandoc: "../../package/main.roc", roc: "nightly-2026-09-08-39a3f89" }
+
+import pandoc.Pandoc
+
+main! = |_args| {
+	abstract = Pandoc.MetaValue.Blocks([
+		Pandoc.Block.Para([Pandoc.Inline.String("Para"), Pandoc.Inline.Space, Pandoc.Inline.String("1")]),
+		Pandoc.Block.Para([Pandoc.Inline.String("Para"), Pandoc.Inline.Space, Pandoc.Inline.String("2")]),
+	])
+	meta = Dict.empty() |> Dict.insert("abstract", abstract)
+	echo!(Pandoc.Document.{ meta, blocks: [] }.to_json())
+	Ok({})
+}
