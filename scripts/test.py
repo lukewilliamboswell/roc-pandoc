@@ -17,11 +17,12 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 CASES = ROOT / "tests" / "cases"
 GOLDENS = ROOT / "tests" / "goldens"
+ROC = os.environ.get("ROC", "roc")
 
 
 def run_case(source: Path, pandoc: str | None) -> tuple[Path, bytes, str | None]:
 	process = subprocess.run(
-		["roc", str(source)],
+		[ROC, str(source)],
 		cwd=ROOT,
 		stdout=subprocess.PIPE,
 		stderr=subprocess.PIPE,
@@ -83,8 +84,8 @@ def main() -> int:
 	)
 	args = parser.parse_args()
 
-	if shutil.which("roc") is None:
-		print("error: roc is not available on PATH", file=sys.stderr)
+	if shutil.which(ROC) is None:
+		print(f"error: Roc compiler is not available: {ROC}", file=sys.stderr)
 		return 2
 	pandoc = shutil.which("pandoc")
 	if args.require_pandoc and pandoc is None:

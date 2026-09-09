@@ -1,0 +1,23 @@
+{
+  "workflows": [
+    "ci.yml"
+  ],
+  "compiler_roots": [
+    "package/main.roc",
+    "examples/hello-world.roc",
+    "examples/csv-reading-list.roc",
+    "examples/markdown-to-pandoc.roc",
+    "tests/cases/block_code_block.roc",
+    "tests/cases/block_code_block_attrs.roc",
+    "tests/cases/block_headers.roc",
+    "tests/cases/block_line.roc",
+    "tests/cases/block_ordered_list.roc",
+    "tests/cases/block_para.roc",
+    "tests/cases/inlines.roc",
+    "tests/cases/meta_blocks.roc",
+    "tests/cases/meta_bool.roc",
+    "tests/cases/meta_inlines.roc",
+    "tests/cases/meta_list.roc"
+  ],
+  "auto_merge": true
+}

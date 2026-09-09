@@ -2,7 +2,7 @@
 
 A Roc package for constructing Pandoc documents and encoding them to Pandoc's JSON AST format. Use it to generate input for Pandoc without assembling untyped JSON by hand.
 
-The package targets `nightly-2026-09-08-39a3f89` and uses nominal types with statically dispatched associated methods. String values and dictionary keys are escaped by Roc's built-in `Json` encoder.
+The package uses nominal types with statically dispatched associated methods. String values and dictionary keys are escaped by Roc's built-in `Json` encoder.
 
 ## Quick start
 
@@ -46,7 +46,7 @@ pandoc --from=json --to=html document.json
 - Inlines: text, emphasis, underline, strong, strikeout, superscript, subscript, small caps, space, soft break, and line break
 - Attributes and ordered-list styles/delimiters
 
-The emitted document uses Pandoc API version `1.23.1`, matching the existing fixtures. Unsupported constructors are absent from the closed nominal unions, so missing support is caught by the type checker rather than producing placeholder JSON.
+Unsupported constructors are absent from the closed nominal unions, so missing support is caught by the type checker rather than producing placeholder JSON.
 
 ## Development
 
@@ -63,7 +63,13 @@ python scripts/test.py --update
 git diff -- tests/goldens
 ```
 
-The examples include a basic document, a CSV reading list, and Markdown conversion. The parser-backed examples demonstrate integrating `roc-pandoc` with a released version of [`roc-parser`](https://github.com/lukewilliamboswell/roc-parser).
+The examples include a basic document, a CSV reading list of work that influenced Roc, and Markdown conversion. The parser-backed examples use [`roc-parser`](https://github.com/lukewilliamboswell/roc-parser). They use [`basic-cli`](https://github.com/roc-lang/basic-cli) to check for a local `pandoc`, render standalone HTML, and open the result using the operating system's available opener:
+
+```sh
+roc examples/csv-reading-list.roc
+```
+
+The reading-list choices reflect Roc's documented lineage and implementation: Roc is a [direct descendant of Elm](https://www.roc-lang.org/faq), and its opportunistic mutation is based on [Perceus](https://www.microsoft.com/en-us/research/wp-content/uploads/2020/11/perceus-tr-v4.pdf).
 
 Generate the public API reference with:
 

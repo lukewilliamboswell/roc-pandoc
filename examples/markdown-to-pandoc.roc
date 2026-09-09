@@ -1,11 +1,15 @@
 app [main!] {
+	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.23.0-rc1/3hT3SoHZ6qbEsa9qVFLUW3547U5LeoNd1KbpqLpz4r1i.tar.zst",
 	pandoc: "../package/main.roc",
 	parser: "https://github.com/lukewilliamboswell/roc-parser/releases/download/1.2.0/GzeZxk7V7GHFa42qhgzd8gUgX6cEyY3NmrwmDfsuskNd.tar.zst",
+	roc: "nightly-2026-09-08-39a3f89",
 }
 
 import pandoc.Pandoc
 import parser.Markdown
 import parser.String
+import cli.OsStr
+import Render
 
 source =
 	\\# September release notes
@@ -17,8 +21,9 @@ source =
 	\\1. Static dispatch
 	\\2. Nominal types
 
+main! : List(OsStr) => Try({}, _)
 main! = |args| {
-	markdown_input = args.get(0) ?? source
+	markdown_input = args.get(1).map_ok(OsStr.display) ?? source
 	document =
 		match String.parse_str(Markdown.all, markdown_input) {
 			Ok(nodes) => Pandoc.Document.{
@@ -31,7 +36,7 @@ main! = |args| {
 			}
 		}
 
-	echo!(document.to_json())
+	Render.html_and_open!("roc-release-notes", document.to_json())?
 	Ok({})
 }
 

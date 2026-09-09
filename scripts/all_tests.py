@@ -37,7 +37,8 @@ def main() -> int:
 	if run([sys.executable, "scripts/test.py", "--require-pandoc"]):
 		return 1
 
-	examples = sorted((ROOT / "examples").glob("*.roc"))
+	# Capitalized files are support modules checked through the apps that import them.
+	examples = sorted(path for path in (ROOT / "examples").glob("*.roc") if path.name[0].islower())
 	with concurrent.futures.ThreadPoolExecutor(max_workers=os.cpu_count() or 1) as pool:
 		for path, status in pool.map(check_example, examples):
 			print(f"{'PASS' if status == 0 else 'FAIL'} {path.relative_to(ROOT)}")
