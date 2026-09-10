@@ -5,6 +5,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      nightly_validation:
+        description: "Validate a nightly candidate"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
