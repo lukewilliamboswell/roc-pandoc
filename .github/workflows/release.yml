@@ -40,14 +40,11 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Read pinned Roc version
-        id: roc-version
-        run: python3 scripts/workflow_helpers.py roc-version --github-output "$GITHUB_OUTPUT"
-      - name: Install Roc
-        uses: roc-lang/setup-roc@f5a74bf90aa694b43ab4a7cbfdb19273bc6aa697
+      - name: Install stable tooling Roc and latest nightly
+        id: roc
+        uses: lukewilliamboswell/setup-roc@89a8a2945bd107f27b160096b3af7f52d2d78369
         with:
-          version: nightly-new-compiler
-          nightly-tag: ${{ steps.roc-version.outputs.nightly-tag }}
+          version: stable-and-nightly
       - name: Install Pandoc
         run: sudo apt-get update && sudo apt-get install --yes pandoc
       - name: Validate release request
@@ -63,9 +60,16 @@ jobs:
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: test "$GITHUB_REF_TYPE" = branch && test "$GITHUB_REF_NAME" = "$DEFAULT_BRANCH" || { echo "Releases must run from the default branch" >&2; exit 1; }
       - name: Validate package
-        run: python3 scripts/all_tests.py
+        run: scripts/check_all.roc
+        env:
+          ROC_STABLE: ${{ steps.roc.outputs.stable-executable }}
+          ROC_NIGHTLY: ${{ steps.roc.outputs.nightly-executable }}
       - name: Bundle package
-        run: python3 scripts/bundle.py --output-dir dist
+        run: scripts/build_bundle.roc
+        env:
+          ROC_STABLE: ${{ steps.roc.outputs.stable-executable }}
+          ROC_NIGHTLY: ${{ steps.roc.outputs.nightly-executable }}
+          OUTPUT_DIR: dist
       - name: Prepare release bundle metadata
         id: bundles
         uses: roc-lang/release-package/actions/prepare-bundles@af2f0cd8662874b825ff3917f4286e793ba18c55
@@ -100,14 +104,11 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Read pinned Roc version
-        id: roc-version
-        run: python3 scripts/workflow_helpers.py roc-version --github-output "$GITHUB_OUTPUT"
-      - name: Install Roc
-        uses: roc-lang/setup-roc@f5a74bf90aa694b43ab4a7cbfdb19273bc6aa697
+      - name: Install stable tooling Roc and latest nightly
+        id: roc
+        uses: lukewilliamboswell/setup-roc@89a8a2945bd107f27b160096b3af7f52d2d78369
         with:
-          version: nightly-new-compiler
-          nightly-tag: ${{ steps.roc-version.outputs.nightly-tag }}
+          version: stable-and-nightly
       - name: Install Pandoc
         run: sudo apt-get update && sudo apt-get install --yes pandoc
       - name: Download release bundles
@@ -116,9 +117,12 @@ jobs:
           name: release-bundles
           path: .release/test-bundles
       - name: Test release bundle
+        env:
+          ROC_STABLE: ${{ steps.roc.outputs.stable-executable }}
+          ROC_NIGHTLY: ${{ steps.roc.outputs.nightly-executable }}
         uses: roc-lang/release-package/actions/test-bundle@af2f0cd8662874b825ff3917f4286e793ba18c55
         with:
-          test_bundle_command: python3 scripts/test_bundle.py --bundle-path
+          test_bundle_command: scripts/test_bundle.roc --
           bundle_path: .release/test-bundles/${{ matrix.artifact_file }}
           bundle_name: ${{ matrix.bundle_name }}
           release_version: ${{ needs.build.outputs.release_version }}
@@ -159,6 +163,13 @@ jobs:
         with:
           name: release-metadata
           path: .release
+      - name: Install stable tooling Roc and latest nightly
+        id: roc
+        uses: lukewilliamboswell/setup-roc@89a8a2945bd107f27b160096b3af7f52d2d78369
+        with:
+          version: stable-and-nightly
+      - name: Install Pandoc
+        run: sudo apt-get update && sudo apt-get install --yes pandoc
       - name: Make release notes
         uses: roc-lang/release-package/actions/make-release-notes@af2f0cd8662874b825ff3917f4286e793ba18c55
         with:
@@ -170,11 +181,18 @@ jobs:
           release_version: ${{ needs.build.outputs.release_version }}
           github_token: ${{ github.token }}
       - name: Pin examples to the published bundle
-        run: python3 scripts/update_example_package_pins.py --release-version "$RELEASE_VERSION" --release-list-file .release/release-bundles.json --repository "$GITHUB_REPOSITORY"
+        run: scripts/update_example_pins.roc
         env:
+          ROC_STABLE: ${{ steps.roc.outputs.stable-executable }}
           RELEASE_VERSION: ${{ needs.build.outputs.release_version }}
+          RELEASE_LIST_FILE: .release/release-bundles.json
+          REPOSITORY: ${{ github.repository }}
+          EXAMPLES_DIR: examples
       - name: Validate released examples
-        run: python3 scripts/all_tests.py
+        run: scripts/check_all.roc
+        env:
+          ROC_STABLE: ${{ steps.roc.outputs.stable-executable }}
+          ROC_NIGHTLY: ${{ steps.roc.outputs.nightly-executable }}
       - name: Open example pin follow-up PR
         uses: roc-lang/release-package/actions/create-followup-pr@af2f0cd8662874b825ff3917f4286e793ba18c55
         with:

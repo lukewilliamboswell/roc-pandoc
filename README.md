@@ -95,18 +95,28 @@ These compact examples emit JSON or focus on construction; use the directory-bas
 
 ## Development
 
-Run the cross-platform test driver from the repository root:
+Run the Roc test driver from the repository root:
 
 ```sh
-python scripts/all_tests.py
+scripts/check_all.roc
 ```
 
 The full driver checks formatting, package and example compilation, golden output, generated API documentation, and whether Pandoc accepts every generated AST. The golden runner executes the Roc test applications in parallel, compares their output with the JSON files in `tests/goldens`, then round-trips each document through `pandoc --from=json --to=json`. To regenerate checked-in outputs after an intentional change:
 
 ```sh
-python scripts/test.py --update
+scripts/test_goldens.roc -- --update
 git diff -- tests/goldens
 ```
+
+The repository scripts use descriptive verb-noun names:
+
+- `scripts/check_all.roc` runs the complete repository check.
+- `scripts/test_goldens.roc` runs or updates the golden tests.
+- `scripts/build_bundle.roc` builds a release bundle in `OUTPUT_DIR`.
+- `scripts/test_bundle.roc` validates the bundle at `BUNDLE_PATH`.
+- `scripts/update_example_pins.roc` updates example package URLs from release metadata.
+
+Each executable app root lives directly under `scripts/`; their shared type modules live under `scripts/src/`.
 
 Generate the public API reference for both exposed modules with the package root:
 
