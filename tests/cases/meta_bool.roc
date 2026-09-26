@@ -1,4 +1,4 @@
-app [main!] { pandoc: "../../package/main.roc", roc: "nightly-2026-09-19-d025939" }
+app [main!] { pandoc: "../../package/main.roc", roc: "nightly-2026-09-26-d6267b4" }
 
 import pandoc.Pandoc
 
