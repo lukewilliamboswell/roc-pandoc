@@ -1,0 +1,36 @@
+name: Setup pinned Roc
+description: Install the tooling and package compilers declared by this checkout.
+outputs:
+  stable-executable:
+    description: Stable tooling compiler executable.
+    value: ${{ steps.roc.outputs.stable-executable }}
+  nightly-executable:
+    description: Pinned package compiler executable.
+    value: ${{ steps.roc.outputs.nightly-executable }}
+runs:
+  using: composite
+  steps:
+    - name: Read compiler pins
+      id: pins
+      shell: bash
+      run: |
+        python3 - <<'PYTHON'
+        import os
+        import re
+        from pathlib import Path
+
+        with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+            for name, root in (("stable-tag", "scripts/check_all.roc"), ("nightly-tag", "package/main.roc")):
+                source = Path(root).read_text()
+                pins = re.findall(r'\broc:\s*"(nightly-[^"\s]+)"', source)
+                if len(pins) != 1:
+                    raise SystemExit(f"Expected one compiler pin in {root}, found {len(pins)}")
+                print(f"{name}={pins[0]}", file=output)
+        PYTHON
+    - name: Install pinned compilers
+      id: roc
+      uses: lukewilliamboswell/setup-roc@89a8a2945bd107f27b160096b3af7f52d2d78369
+      with:
+        version: stable-and-nightly
+        stable-tag: ${{ steps.pins.outputs.stable-tag }}
+        nightly-tag: ${{ steps.pins.outputs.nightly-tag }}

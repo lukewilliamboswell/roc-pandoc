@@ -1,6 +1,7 @@
 {
   "workflows": [
-    "ci.yml"
+    "ci.yml",
+    "release.yml"
   ],
   "compiler_roots": [
     "package/main.roc",
