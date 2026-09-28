@@ -16,7 +16,7 @@ import src/Script
 main! = |_args| {
 	# Repository automation is pinned to a stable Roc so routine maintenance does
 	# not break when nightly changes. The package and examples are checked with the
-	# latest nightly so this repository still detects upcoming compiler changes.
+	# pinned nightly; the updater advances those pins after validation.
 	roc_stable = Script.roc_stable!()?
 	roc_nightly = Script.roc_nightly!()?
 

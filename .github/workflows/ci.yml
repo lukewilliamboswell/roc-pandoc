@@ -26,11 +26,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Install stable tooling Roc and latest nightly
+      - name: Install pinned tooling and package compilers
         id: roc
-        uses: lukewilliamboswell/setup-roc@89a8a2945bd107f27b160096b3af7f52d2d78369
-        with:
-          version: stable-and-nightly
+        uses: ./.github/actions/setup-roc
       - run: roc-nightly version
       - name: Install Pandoc
         run: sudo apt-get update && sudo apt-get install --yes pandoc
