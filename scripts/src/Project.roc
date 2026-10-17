@@ -1,6 +1,5 @@
-import ascii.Ascii
 import cli.Env
-import cli.Path exposing [Path]
+import cli.Path
 import Release
 
 ## Repository paths, defaults, and working-tree discovery for the scripts.
@@ -57,7 +56,7 @@ valid_segment = |segment|
 			and segment != ".."
 				and !segment.contains("/")
 					and !segment.contains("\\")
-						and Ascii.from_str(segment).is_ok()
+						and segment.to_utf8().all(|byte| byte < 128)
 
 valid_repo_path = |repo_path| !repo_path.segments.is_empty() and repo_path.segments.all(valid_segment)
 

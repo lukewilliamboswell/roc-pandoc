@@ -1,5 +1,4 @@
-import cli.Path exposing [Path]
-import ascii.Ascii
+import cli.Path
 
 ## Deterministic filesystem discovery helpers for repository automation.
 Files := [].{
@@ -30,17 +29,26 @@ Files := [].{
 	sort_paths : List(Path) -> Try(List(Path), _)
 	sort_paths = |paths| {
 		keyed = paths.map_try(
-			|path|
-				Ascii.from_str(Path.display(path))
-					.map_ok(|key| (key, path))
-					.map_err(|_| NonAsciiRepositoryPath(Path.display(path))),
+			|path| {
+				key = Str.to_utf8(Path.display(path))
+				if key.all(|byte| byte < 128) Ok((key, path)) else Err(NonAsciiRepositoryPath(Path.display(path)))
+			},
 		)?
 		Ok(
-			List.sort_with(keyed, |(left, _), (right, _)| Ascii.order_relative_to(left, right))
+			List.sort_with(keyed, |(left, _), (right, _)| compare_bytes(left, right))
 				|> List.map(|(_, path)| path),
 		)
 	}
 }
+
+compare_bytes = |left, right|
+	match (left, right) {
+		([a, .. as left_rest], [b, .. as right_rest]) =>
+			if a < b LT else if a > b GT else compare_bytes(left_rest, right_rest)
+		([], []) => EQ
+		([], _) => LT
+		(_, []) => GT
+	}
 
 find_apps! = |entries, found|
 	match entries {
