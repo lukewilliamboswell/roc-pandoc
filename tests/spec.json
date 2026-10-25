@@ -21,6 +21,19 @@
           "name": "default",
           "stderr": "",
           "stdin": "",
+          "stdout": "Generated field-notes.epub\n"
+        }
+      ],
+      "path": "examples/ebook/main.roc"
+    },
+    {
+      "cases": [
+        {
+          "args": [],
+          "exit_code": 0,
+          "name": "default",
+          "stderr": "",
+          "stdin": "",
           "stdout": "{\"pandoc-api-version\":[1,23,1],\"meta\":{\"isBasic\":{\"t\":\"MetaBool\",\"c\":true}},\"blocks\":[{\"t\":\"Header\",\"c\":[1,[\"first\",[],[]],[{\"t\":\"Str\",\"c\":\"Hello\"}]]},{\"t\":\"Para\",\"c\":[{\"t\":\"Str\",\"c\":\"world\"}]}]}\n"
         }
       ],
@@ -38,6 +51,71 @@
         }
       ],
       "path": "examples/markdown-to-pandoc.roc"
+    },
+    {
+      "cases": [
+        {
+          "args": [],
+          "exit_code": 0,
+          "name": "default",
+          "stderr": "",
+          "stdin": "",
+          "stdout": "Generated quarterly-report.docx\n"
+        }
+      ],
+      "path": "examples/office-report/main.roc"
+    },
+    {
+      "cases": [
+        {
+          "args": [],
+          "exit_code": 0,
+          "name": "default",
+          "stderr": "",
+          "stdin": "",
+          "stdout": "Generated research.html\n"
+        }
+      ],
+      "path": "examples/research-summary/main.roc"
+    },
+    {
+      "cases": [
+        {
+          "args": [],
+          "exit_code": 0,
+          "name": "default",
+          "stderr": "",
+          "stdin": "",
+          "stdout": "Generated demo-day.pptx\n"
+        }
+      ],
+      "path": "examples/slide-deck/main.roc"
+    },
+    {
+      "cases": [
+        {
+          "args": [],
+          "exit_code": 0,
+          "name": "default",
+          "stderr": "",
+          "stdin": "",
+          "stdout": "Generated paper.tex\n"
+        }
+      ],
+      "path": "examples/technical-paper/main.roc"
+    },
+    {
+      "cases": [
+        {
+          "args": [],
+          "exit_code": 0,
+          "name": "default",
+          "stderr": "",
+          "stdin": "",
+          "stdout": "Generated product.html\n"
+        }
+      ],
+      "path": "examples/web-page/main.roc"
     }
   ],
   "dependencies": [],

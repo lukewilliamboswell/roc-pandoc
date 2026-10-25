@@ -91,7 +91,7 @@ Smaller source-oriented examples demonstrate individual integration techniques, 
 - `examples/csv-reading-list.roc` turns CSV records into a document using [`roc-parser`](https://github.com/lukewilliamboswell/roc-parser).
 - `examples/markdown-to-pandoc.roc` parses a small Markdown input into Pandoc structure.
 
-Render one with Pandoc, for example `roc examples/csv-reading-list.roc | pandoc --from=json --to=html --standalone --output=reading-list.html`. Each release attaches these examples, depending on that release's bundle, with the output they printed; use the directory-based workflows as templates for applications that create day-to-day document formats.
+Render one with Pandoc, for example `roc examples/csv-reading-list.roc | pandoc --from=json --to=html --standalone --output=reading-list.html`. Each release attaches every example, file and directory alike, depending on that release's bundle and with the output it printed; use the directory-based workflows as templates for applications that create day-to-day document formats.
 
 ## Development
 
