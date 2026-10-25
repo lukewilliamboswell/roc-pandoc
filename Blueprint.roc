@@ -26,9 +26,13 @@ config = [
 			Expect(["git", "pandoc", "roc", "unzip"]),
 		],
 	),
+	# The shared release workflow runs this utility against the `roc` on PATH; a
+	# maintainer runs the same task locally, such as `-- test-examples --update`.
+	Environment("release", [Programs([Fetch("release-package", Recipes.file("https://github.com/lukewilliamboswell/roc-automation/releases/download/tools-0.5.0/release-package-{system}"))]), Expect(["roc", "git", "gh", "pandoc", "tar", "unzip", "zip", "chmod", "touch", "env"])]),
 	Shell("default", [Use("dev")]),
 	# Everything checked before the release workflow packages anything.
 	Task("check", [Use("dev"), Run(["scripts/check_all.roc"])]),
+	Task("release-package", [Use("release"), Run(["release-package"])]),
 	# The golden tests of tests/cases against tests/goldens.
 	Task("goldens", [Use("dev"), Run(["scripts/test_goldens.roc", "--"])]),
 ]
