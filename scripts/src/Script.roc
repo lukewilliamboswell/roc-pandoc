@@ -38,12 +38,13 @@ Script := [].{
 	command : OsStr -> Command
 	command = |program| Command.{ base: Cmd.new(program), program }
 
-	## Resolve the stable tooling compiler from `ROC_STABLE`, falling back to `roc`.
+	## Resolve the stable tooling compiler from `ROC_STABLE`, falling back to the
+	## `roc-stable` that Blueprint provides.
 	roc_stable! : () => Try(Command, _)
 	roc_stable! = || {
 		match Env.var!("ROC_STABLE") {
 			Ok(value) => Ok(Script.command(value))
-			Err(VarNotFound(_)) => Ok(Script.command("roc"))
+			Err(VarNotFound(_)) => Ok(Script.command("roc-stable"))
 			Err(err) => Err(EnvironmentInputError("ROC_STABLE", err))
 		}
 	}

@@ -1,0 +1,31 @@
+name: Nightly compatibility
+
+# The latest release's examples archive, exactly as published, on the latest
+# Roc nightly. The shared workflow selects one release and compiler pair and
+# owns validation, execution and issue reporting.
+on:
+  schedule:
+    - cron: "7 13 * * *"
+  workflow_dispatch:
+    inputs:
+      nightly-tag:
+        description: "Exact nightly tag for a diagnostic rerun; empty resolves latest"
+        type: string
+        default: ""
+      release-tag:
+        description: "Exact final release tag for a diagnostic rerun; empty resolves latest"
+        type: string
+        default: ""
+
+permissions: {}
+
+jobs:
+  compatibility:
+    permissions:
+      contents: read
+      issues: write
+    uses: lukewilliamboswell/roc-automation/.github/workflows/nightly-compatibility.yml@7aff4132691ad4fc348abe9df146a57512b49bd6 # tools-0.4.0
+    with:
+      nightly-tag: ${{ inputs.nightly-tag || '' }}
+      release-tag: ${{ inputs.release-tag || '' }}
+      runners: '["ubuntu-24.04"]'

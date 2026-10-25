@@ -1,15 +1,14 @@
 app [main!] {
-	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.24.0/AEjfyaMFFbh8FJrkkHJy68riVNPr3Qp6c6PawWQjBwMH.tar.zst",
-	pandoc: "https://github.com/lukewilliamboswell/roc-pandoc/releases/download/0.1.0/8pDy8BV37fo72fRdpLr6rsAcosdJKJgVR2mT9GU17FuD.tar.zst",
+	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.25.0/CZsY7tYZwR3rj9kYbpaCfxki2yVAaRL8bBwMLvB2xkbA.tar.zst",
+	pandoc: "../package/main.roc",
 	parser: "https://github.com/lukewilliamboswell/roc-parser/releases/download/1.2.0/GzeZxk7V7GHFa42qhgzd8gUgX6cEyY3NmrwmDfsuskNd.tar.zst",
-	roc: "nightly-2026-10-06-c34079d",
 }
 
 import pandoc.Pandoc
 import parser.Markdown
 import parser.String
 import cli.OsStr
-import Render
+import cli.Stdout
 
 source =
 	\\# September release notes
@@ -36,7 +35,7 @@ main! = |args| {
 			}
 		}
 
-	Render.html_and_open!("roc-release-notes", Json.to_str(document))?
+	Stdout.line!(Json.to_str(document))?
 	Ok({})
 }
 

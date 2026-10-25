@@ -1,21 +1,20 @@
 app [main!] {
-	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.24.0/AEjfyaMFFbh8FJrkkHJy68riVNPr3Qp6c6PawWQjBwMH.tar.zst",
-	pandoc: "https://github.com/lukewilliamboswell/roc-pandoc/releases/download/0.1.0/8pDy8BV37fo72fRdpLr6rsAcosdJKJgVR2mT9GU17FuD.tar.zst",
+	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.25.0/CZsY7tYZwR3rj9kYbpaCfxki2yVAaRL8bBwMLvB2xkbA.tar.zst",
+	pandoc: "../package/main.roc",
 	parser: "https://github.com/lukewilliamboswell/roc-parser/releases/download/1.2.0/GzeZxk7V7GHFa42qhgzd8gUgX6cEyY3NmrwmDfsuskNd.tar.zst",
-	roc: "nightly-2026-10-06-c34079d",
 }
 
 import pandoc.Pandoc
 import parser.CSV
 import parser.Parser
 import cli.OsStr
-import Render
+import cli.Stdout
 
 input =
 	\\Elm: Concurrent FRP for Functional GUIs,Evan Czaplicki,2012
 	\\Koka: Programming with Row Polymorphic Effect Types,Daan Leijen,2014
 	\\Perceus: Garbage Free Reference Counting with Reuse,Sebastian Reinking and Ningning Xie and Leonardo de Moura and Daan Leijen,2021
-	\\Tail Modulo Cons,Frédéric Bour and Basile Clément and Gabriel Scherer,2021
+	\\Tail Modulo Cons,Frederic Bour and Basile Clement and Gabriel Scherer,2021
 	\\Compiling Pattern Matching to Good Decision Trees,Luc Maranget,2008
 
 Book : { title : Str, author : Str, year : U64 }
@@ -36,7 +35,7 @@ main! = |args| {
 			Err(problem) => Pandoc.Document.{ meta: Dict.empty(), blocks: [Pandoc.Block.Para([Pandoc.Inline.String("Invalid reading list: ${Str.inspect(problem)}")])] }
 		}
 
-	Render.html_and_open!("roc-influences", Json.to_str(document))?
+	Stdout.line!(Json.to_str(document))?
 	Ok({})
 }
 

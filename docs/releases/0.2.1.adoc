@@ -1,0 +1,23 @@
+= roc-pandoc 0.2.1
+
+This patch changes no package APIs. It moves the repository onto the shared
+roc-automation release workflow: every release now ships an examples archive
+whose examples depend on this release's bundle, with the output they printed,
+and the nightly compatibility check runs that archive on the latest Roc nightly.
+
+== Use this release
+
+[source,roc]
+----
+app [main!] {
+	pandoc: "{package-url}",
+}
+----
+
+== Examples
+
+* `examples/csv-reading-list.roc` and `examples/markdown-to-pandoc.roc` print
+  their Pandoc JSON document to standard output; pipe it into `pandoc
+  --from=json` to render it. They no longer write a file and open a browser.
+* The directory examples under `examples/` still render documents with
+  `pandoc` and depend on the package by path.

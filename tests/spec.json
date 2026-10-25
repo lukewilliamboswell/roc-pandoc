@@ -1,0 +1,46 @@
+{
+  "apps": [
+    {
+      "cases": [
+        {
+          "args": [],
+          "exit_code": 0,
+          "name": "default",
+          "stderr": "",
+          "stdin": "",
+          "stdout": "{\"pandoc-api-version\":[1,23,1],\"meta\":{\"title\":{\"t\":\"MetaInlines\",\"c\":[{\"t\":\"Str\",\"c\":\"Functional programming reading list\"}]},\"generated\":{\"t\":\"MetaBool\",\"c\":true}},\"blocks\":[{\"t\":\"Header\",\"c\":[1,[\"reading-list\",[\"catalogue\"],[[\"data-source\",\"books.csv\"]]],[{\"t\":\"Str\",\"c\":\"Reading list\"}]]},{\"t\":\"OrderedList\",\"c\":[[1,{\"t\":\"Decimal\"},{\"t\":\"Period\"}],[[{\"t\":\"Plain\",\"c\":[{\"t\":\"Strong\",\"c\":[{\"t\":\"Str\",\"c\":\"Elm: Concurrent FRP for Functional GUIs\"}]},{\"t\":\"Space\"},{\"t\":\"Emph\",\"c\":[{\"t\":\"Str\",\"c\":\"by Evan Czaplicki\"}]},{\"t\":\"Space\"},{\"t\":\"Str\",\"c\":\"(2012)\"}]}],[{\"t\":\"Plain\",\"c\":[{\"t\":\"Strong\",\"c\":[{\"t\":\"Str\",\"c\":\"Koka: Programming with Row Polymorphic Effect Types\"}]},{\"t\":\"Space\"},{\"t\":\"Emph\",\"c\":[{\"t\":\"Str\",\"c\":\"by Daan Leijen\"}]},{\"t\":\"Space\"},{\"t\":\"Str\",\"c\":\"(2014)\"}]}],[{\"t\":\"Plain\",\"c\":[{\"t\":\"Strong\",\"c\":[{\"t\":\"Str\",\"c\":\"Perceus: Garbage Free Reference Counting with Reuse\"}]},{\"t\":\"Space\"},{\"t\":\"Emph\",\"c\":[{\"t\":\"Str\",\"c\":\"by Sebastian Reinking and Ningning Xie and Leonardo de Moura and Daan Leijen\"}]},{\"t\":\"Space\"},{\"t\":\"Str\",\"c\":\"(2021)\"}]}],[{\"t\":\"Plain\",\"c\":[{\"t\":\"Strong\",\"c\":[{\"t\":\"Str\",\"c\":\"Tail Modulo Cons\"}]},{\"t\":\"Space\"},{\"t\":\"Emph\",\"c\":[{\"t\":\"Str\",\"c\":\"by Frederic Bour and Basile Clement and Gabriel Scherer\"}]},{\"t\":\"Space\"},{\"t\":\"Str\",\"c\":\"(2021)\"}]}],[{\"t\":\"Plain\",\"c\":[{\"t\":\"Strong\",\"c\":[{\"t\":\"Str\",\"c\":\"Compiling Pattern Matching to Good Decision Trees\"}]},{\"t\":\"Space\"},{\"t\":\"Emph\",\"c\":[{\"t\":\"Str\",\"c\":\"by Luc Maranget\"}]},{\"t\":\"Space\"},{\"t\":\"Str\",\"c\":\"(2008)\"}]}]]]}]}\n"
+        }
+      ],
+      "path": "examples/csv-reading-list.roc"
+    },
+    {
+      "cases": [
+        {
+          "args": [],
+          "exit_code": 0,
+          "name": "default",
+          "stderr": "",
+          "stdin": "",
+          "stdout": "{\"pandoc-api-version\":[1,23,1],\"meta\":{\"isBasic\":{\"t\":\"MetaBool\",\"c\":true}},\"blocks\":[{\"t\":\"Header\",\"c\":[1,[\"first\",[],[]],[{\"t\":\"Str\",\"c\":\"Hello\"}]]},{\"t\":\"Para\",\"c\":[{\"t\":\"Str\",\"c\":\"world\"}]}]}\n"
+        }
+      ],
+      "path": "examples/hello-world.roc"
+    },
+    {
+      "cases": [
+        {
+          "args": [],
+          "exit_code": 0,
+          "name": "default",
+          "stderr": "",
+          "stdin": "",
+          "stdout": "{\"pandoc-api-version\":[1,23,1],\"meta\":{\"title\":{\"t\":\"MetaString\",\"c\":\"Roc release notes\"}},\"blocks\":[{\"t\":\"Header\",\"c\":[1,[\"\",[],[]],[{\"t\":\"Str\",\"c\":\"September release notes\"}]]},{\"t\":\"Para\",\"c\":[{\"t\":\"Str\",\"c\":\"The \"},{\"t\":\"Strong\",\"c\":[{\"t\":\"Str\",\"c\":\"new compiler\"}]},{\"t\":\"Str\",\"c\":\" is \"},{\"t\":\"Emph\",\"c\":[{\"t\":\"Str\",\"c\":\"fast\"}]},{\"t\":\"Str\",\"c\":\" and \"},{\"t\":\"Strikeout\",\"c\":[{\"t\":\"Str\",\"c\":\"experimental\"}]},{\"t\":\"Str\",\"c\":\" ready to try.\"}]},{\"t\":\"Header\",\"c\":[2,[\"\",[],[]],[{\"t\":\"Str\",\"c\":\"Highlights\"}]]},{\"t\":\"OrderedList\",\"c\":[[1,{\"t\":\"Decimal\"},{\"t\":\"Period\"}],[[{\"t\":\"Para\",\"c\":[{\"t\":\"Str\",\"c\":\"Static dispatch\"}]}],[{\"t\":\"Para\",\"c\":[{\"t\":\"Str\",\"c\":\"Nominal types\"}]}]]]}]}\n"
+        }
+      ],
+      "path": "examples/markdown-to-pandoc.roc"
+    }
+  ],
+  "dependencies": [],
+  "release": "working-tree",
+  "schema_version": 1
+}

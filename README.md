@@ -85,13 +85,13 @@ Run each workflow from its own directory so its relative output paths resolve be
 | Technical paper | `cd examples/technical-paper && roc main.roc` | LaTeX source, with a documented PDF variant |
 | Research summary | `cd examples/research-summary && roc main.roc` | HTML with citations and a comparison table |
 
-Smaller source-oriented examples demonstrate individual integration techniques:
+Smaller source-oriented examples demonstrate individual integration techniques, each printing its Pandoc JSON document to standard output:
 
 - `examples/hello-world.roc` constructs a minimal AST.
 - `examples/csv-reading-list.roc` turns CSV records into a document using [`roc-parser`](https://github.com/lukewilliamboswell/roc-parser).
 - `examples/markdown-to-pandoc.roc` parses a small Markdown input into Pandoc structure.
 
-These compact examples emit JSON or focus on construction; use the directory-based workflows as templates for applications that create day-to-day document formats.
+Render one with Pandoc, for example `roc examples/csv-reading-list.roc | pandoc --from=json --to=html --standalone --output=reading-list.html`. Each release attaches these examples, depending on that release's bundle, with the output they printed; use the directory-based workflows as templates for applications that create day-to-day document formats.
 
 ## Development
 
