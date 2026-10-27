@@ -24,8 +24,9 @@ jobs:
     permissions:
       contents: read
       issues: write
-    uses: lukewilliamboswell/roc-automation/.github/workflows/nightly-compatibility.yml@7aff4132691ad4fc348abe9df146a57512b49bd6 # tools-0.4.0
+    uses: lukewilliamboswell/roc-automation/.github/workflows/nightly-compatibility.yml@9b5c724e84d53fc427a0017142cf94ebe729e09f # tools-0.4.0
     with:
       nightly-tag: ${{ inputs.nightly-tag || '' }}
       release-tag: ${{ inputs.release-tag || '' }}
       runners: '["ubuntu-24.04"]'
+      setup-command: '["sudo", "apt-get", "install", "-y", "pandoc"]'

@@ -58,6 +58,7 @@ header = |source|
 	}
 
 check_script_tooling! = |roc_stable| {
+	roc_stable.run!(["test", "scripts/src/CheckStatus.roc"])?
 	roc_stable.run!(["check", "scripts/test_goldens.roc"])?
 	roc_stable.run!(["fmt", "--check", "scripts"])
 }

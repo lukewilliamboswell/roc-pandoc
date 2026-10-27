@@ -1,5 +1,5 @@
 app [main!] {
-	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.25.0/CZsY7tYZwR3rj9kYbpaCfxki2yVAaRL8bBwMLvB2xkbA.tar.zst",
+	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.26.0/GddgvsGjiNXrHFW6au5i5dUDbTs8FinQdrgE2Gqmw53t.tar.zst",
 	pandoc: "../package/main.roc",
 	parser: "https://github.com/lukewilliamboswell/roc-parser/releases/download/1.2.0/GzeZxk7V7GHFa42qhgzd8gUgX6cEyY3NmrwmDfsuskNd.tar.zst",
 }
@@ -8,7 +8,7 @@ import pandoc.Pandoc
 import parser.CSV
 import parser.Parser
 import cli.OsStr
-import cli.Stdout
+import Render
 
 input =
 	\\Elm: Concurrent FRP for Functional GUIs,Evan Czaplicki,2012
@@ -28,14 +28,14 @@ book_parser =
 
 main! : List(OsStr) => Try({}, _)
 main! = |args| {
-	csv_input = args.get(0).map_ok(OsStr.display) ?? input
+	csv_input = args.keep_if(|arg| OsStr.display(arg) != "--open").get(0).map_ok(OsStr.display) ?? input
 	document =
 		match CSV.parse_str(book_parser, csv_input) {
 			Ok(books) => reading_list(books)
 			Err(problem) => Pandoc.Document.{ meta: Dict.empty(), blocks: [Pandoc.Block.Para([Pandoc.Inline.String("Invalid reading list: ${Str.inspect(problem)}")])] }
 		}
 
-	Stdout.line!(Json.to_str(document))?
+	Render.html_and_open!("roc-influences", Json.to_str(document), args.any(|arg| OsStr.display(arg) == "--open"))?
 	Ok({})
 }
 

@@ -16,9 +16,8 @@ app [main!] {
 
 == Examples
 
-* `examples/csv-reading-list.roc` and `examples/markdown-to-pandoc.roc` print
-  their Pandoc JSON document to standard output; pipe it into `pandoc
-  --from=json` to render it. They no longer write a file and open a browser.
+* The CSV and Markdown examples render HTML unattended by default. Pass
+  `--open` to launch a viewer, optionally alongside a custom input string.
 * The directory examples under `examples/` render documents with `pandoc`
   and ship in the examples archive with their data files, each depending on
   this release's bundle.

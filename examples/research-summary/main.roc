@@ -1,7 +1,7 @@
 ## Render citations and a comparison table using a CSL bibliography:
 ## cd examples/research-summary && roc main.roc
 app [main!] {
-	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.25.0/CZsY7tYZwR3rj9kYbpaCfxki2yVAaRL8bBwMLvB2xkbA.tar.zst",
+	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.26.0/GddgvsGjiNXrHFW6au5i5dUDbTs8FinQdrgE2Gqmw53t.tar.zst",
 	pandoc: "../../package/main.roc",
 }
 
@@ -23,7 +23,7 @@ render! = |output_path, json, options| {
 	input_path = "${output_path}.pandoc.json"
 	input_path.write_utf8!(json)?
 	args = ["--from=json", "--output=${output_path}"].concat(options).append(input_path.display()).map(OsStr.from_str)
-	Cmd.exec!("pandoc", args)?
+	Cmd.call!("pandoc", args)?
 	Stdout.line!("Generated ${output_path}")?
 	Ok({})
 }

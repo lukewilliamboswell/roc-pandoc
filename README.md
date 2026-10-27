@@ -85,38 +85,20 @@ Run each workflow from its own directory so its relative output paths resolve be
 | Technical paper | `cd examples/technical-paper && roc main.roc` | LaTeX source, with a documented PDF variant |
 | Research summary | `cd examples/research-summary && roc main.roc` | HTML with citations and a comparison table |
 
-Smaller source-oriented examples demonstrate individual integration techniques, each printing its Pandoc JSON document to standard output:
-
-- `examples/hello-world.roc` constructs a minimal AST.
-- `examples/csv-reading-list.roc` turns CSV records into a document using [`roc-parser`](https://github.com/lukewilliamboswell/roc-parser).
-- `examples/markdown-to-pandoc.roc` parses a small Markdown input into Pandoc structure.
-
-Render one with Pandoc, for example `roc examples/csv-reading-list.roc | pandoc --from=json --to=html --standalone --output=reading-list.html`. Each release attaches every example, file and directory alike, depending on that release's bundle and with the output it printed; use the directory-based workflows as templates for applications that create day-to-day document formats.
+The hello-world example prints Pandoc JSON. The CSV reading-list and Markdown examples render HTML without opening a viewer; pass `--open` to open it. An optional input string can still be supplied. Each release includes all nine examples and their expected output in its examples ZIP.
 
 ## Development
 
-Run the Roc test driver from the repository root:
+Install Blueprint 0.8.0, Pandoc, unzip, and the latest Roc nightly, then run:
 
 ```sh
-scripts/check_all.roc
+blueprint check
+blueprint run check
+blueprint run goldens -- --update
+blueprint run release-package -- test-examples
 ```
 
-The full driver checks formatting, package and example compilation, golden output, generated API documentation, and whether Pandoc accepts every generated AST. The golden runner executes the Roc test applications in parallel, compares their output with the JSON files in `tests/goldens`, then round-trips each document through `pandoc --from=json --to=json`. To regenerate checked-in outputs after an intentional change:
-
-```sh
-scripts/test_goldens.roc -- --update
-git diff -- tests/goldens
-```
-
-The repository scripts use descriptive verb-noun names:
-
-- `scripts/check_all.roc` runs the complete repository check.
-- `scripts/test_goldens.roc` runs or updates the golden tests.
-- `scripts/build_bundle.roc` builds a release bundle in `OUTPUT_DIR`.
-- `scripts/test_bundle.roc` validates the bundle at `BUNDLE_PATH`.
-- `scripts/update_example_pins.roc` updates example package URLs from release metadata.
-
-Each executable app root lives directly under `scripts/`; their shared type modules live under `scripts/src/`.
+Blueprint locks the tooling compiler separately; the package compiler is the host's latest nightly. The shared release workflow builds and tests the exact bundle and examples archive before publication. Repository examples follow the working tree; archived examples name the immutable release bundle.
 
 Generate the public API reference for both exposed modules with the package root:
 

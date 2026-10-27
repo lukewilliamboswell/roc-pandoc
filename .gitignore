@@ -26,3 +26,8 @@ __pycache__/
 
 # Release files built by the shared workflow or locally.
 dist/
+
+examples/roc-influences.json
+examples/roc-influences.html
+examples/roc-release-notes.json
+examples/roc-release-notes.html

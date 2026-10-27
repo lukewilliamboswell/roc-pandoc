@@ -1,5 +1,5 @@
 app [main!] {
-	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.25.0/CZsY7tYZwR3rj9kYbpaCfxki2yVAaRL8bBwMLvB2xkbA.tar.zst",
+	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.26.0/GddgvsGjiNXrHFW6au5i5dUDbTs8FinQdrgE2Gqmw53t.tar.zst",
 	pandoc: "../package/main.roc",
 	parser: "https://github.com/lukewilliamboswell/roc-parser/releases/download/1.2.0/GzeZxk7V7GHFa42qhgzd8gUgX6cEyY3NmrwmDfsuskNd.tar.zst",
 }
@@ -8,7 +8,7 @@ import pandoc.Pandoc
 import parser.Markdown
 import parser.String
 import cli.OsStr
-import cli.Stdout
+import Render
 
 source =
 	\\# September release notes
@@ -22,7 +22,7 @@ source =
 
 main! : List(OsStr) => Try({}, _)
 main! = |args| {
-	markdown_input = args.get(0).map_ok(OsStr.display) ?? source
+	markdown_input = args.keep_if(|arg| OsStr.display(arg) != "--open").get(0).map_ok(OsStr.display) ?? source
 	document =
 		match String.parse_str(Markdown.all, markdown_input) {
 			Ok(nodes) => Pandoc.Document.{
@@ -35,7 +35,7 @@ main! = |args| {
 			}
 		}
 
-	Stdout.line!(Json.to_str(document))?
+	Render.html_and_open!("roc-release-notes", Json.to_str(document), args.any(|arg| OsStr.display(arg) == "--open"))?
 	Ok({})
 }
 

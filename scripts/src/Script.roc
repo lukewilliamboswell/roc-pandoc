@@ -1,3 +1,4 @@
+import CheckStatus
 import cli.Cmd
 import cli.Env
 import cli.OsStr
@@ -18,7 +19,18 @@ Script := [].{
 			command = self.base.args(args)
 			display = Str.join_with([self.program].concat(args).map(OsStr.display), " ")
 			Stdout.line!("\n${heading("RUN", Cyan)} ${display}")?
-			command.exec_cmd!()
+			if args.first().map_ok(OsStr.display) == Ok("check") {
+				output = command.run!().map_err(|err| CommandRunFailed(err))?
+				Stdout.write_bytes!(output.stdout_bytes)?
+				Stderr.write_bytes!(output.stderr_bytes)?
+				match output.status {
+					Exited(code) if CheckStatus.succeeded(code) => Ok({})
+					Exited(code) => Err(CommandExited(code))
+					Signaled(signal) => Err(CommandSignaled(signal))
+				}
+			} else {
+				command.exec_cmd!()
+			}
 		}
 
 		## Run in `cwd` with byte input and return captured standard output.
