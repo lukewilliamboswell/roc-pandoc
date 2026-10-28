@@ -8,20 +8,24 @@ app [main!] {
 
 import cli.Cmd
 import cli.Env
-import cli.OsStr
 import cli.Path
 import src/Files
 import src/Script
 
+## Everything checked before the release workflow packages anything.
+##
+##     blueprint run check
+##
+## `roc-stable`, pinned by Blueprint.roc, runs this script and the golden-test
+## driver. The package, the examples and the golden cases are checked with the
+## `roc` on PATH, which is meant to be the latest nightly. The file examples,
+## the bundle and the examples archive are the shared release workflow's job:
+## `release-package test-examples` runs those examples against the working tree.
 main! = |_args| {
-	# Repository automation is pinned to a stable Roc so routine maintenance does
-	# not break when nightly changes. The package and examples are checked with the
-	# pinned nightly; the updater advances those pins after validation.
 	roc_stable = Script.roc_stable!()?
 	roc_nightly = Script.roc_nightly!()?
 
-	# Keep these phases in execution order: tooling first, then everything that
-	# exercises roc-pandoc with the development compiler.
+	check_compiler_pins!()?
 	check_script_tooling!(roc_stable)?
 	test_goldens!(roc_stable)?
 	check_package!(roc_nightly)?
@@ -31,9 +35,31 @@ main! = |_args| {
 	Script.command("git").run!(["diff", "--check"])
 }
 
+# The package compiler floats, so nothing outside scripts/ names a compiler.
+check_compiler_pins! = || {
+	for directory in ["package", "examples", "tests/cases"] {
+		for source in Files.app_sources!(directory)? {
+			if header(source.source).contains("roc:") {
+				return Script.fail!("${Path.display(source.path)}: remove the `roc:` header field; the package compiler is the latest nightly")
+			}
+		}
+	}
+	if header(Path.read_utf8!("package/main.roc")?).contains("roc:") {
+		return Script.fail!("package/main.roc: remove the `roc:` header field; the package compiler is the latest nightly")
+	}
+	Script.pass!("only the scripts name a compiler")
+}
+
+# The header of a Roc source file: from its first line up to the closing brace.
+header = |source|
+	match Str.split_first(source, "}") {
+		Ok({ before, .. }) => before
+		Err(_) => source
+	}
+
 check_script_tooling! = |roc_stable| {
-	# These tests cover the pure planning logic used by the release scripts.
-	roc_stable.run!(["test", "scripts/src/UpdatePins.roc"])?
+	roc_stable.run!(["test", "scripts/src/CheckStatus.roc"])?
+	roc_stable.run!(["check", "scripts/test_goldens.roc"])?
 	roc_stable.run!(["fmt", "--check", "scripts"])
 }
 

@@ -1,9 +1,8 @@
 ## Produce LaTeX, or replace the final arguments with `--pdf-engine=xelatex -o paper.pdf` for PDF:
 ## cd examples/technical-paper && roc main.roc
 app [main!] {
-	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.24.0/AEjfyaMFFbh8FJrkkHJy68riVNPr3Qp6c6PawWQjBwMH.tar.zst",
-	pandoc: "https://github.com/lukewilliamboswell/roc-pandoc/releases/download/0.1.0/8pDy8BV37fo72fRdpLr6rsAcosdJKJgVR2mT9GU17FuD.tar.zst",
-	roc: "nightly-2026-10-06-c34079d",
+	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.26.0/GddgvsGjiNXrHFW6au5i5dUDbTs8FinQdrgE2Gqmw53t.tar.zst",
+	pandoc: "../../package/main.roc",
 }
 
 import cli.Cmd
@@ -24,7 +23,7 @@ render! = |output_path, json, options| {
 	input_path = "${output_path}.pandoc.json"
 	input_path.write_utf8!(json)?
 	args = ["--from=json", "--output=${output_path}"].concat(options).append(input_path.display()).map(OsStr.from_str)
-	Cmd.exec!("pandoc", args)?
+	Cmd.call!("pandoc", args)?
 	Stdout.line!("Generated ${output_path}")?
 	Ok({})
 }
