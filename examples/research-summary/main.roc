@@ -83,5 +83,8 @@ main! = |_args| {
 		table,
 	])
 		|> Author.with_meta(meta)
-	render!("research.html", Json.to_str(document), ["--citeproc", "--bibliography=references.bib", "--to=html5", "--standalone"])
+	# Both a reader in this directory and the shared archive runner at the
+	# suite root must resolve the bibliography shipped with this example.
+	bibliography = if (Path.is_file!("references.bib")?) "references.bib" else "examples/research-summary/references.bib"
+	render!("research.html", Json.to_str(document), ["--citeproc", "--bibliography=${bibliography}", "--to=html5", "--standalone"])
 }

@@ -104,6 +104,12 @@ test_generated_artifacts! = |roc_nightly|
 					return Err(NoPandocBlocks(Path.display(json_path)))
 				}
 				Script.pass!("examples/${workflow}/${output_name}")?
+				if workflow == "research-summary" {
+					# The shared nightly executes native apps from the archive root.
+					_ = roc_nightly.capture!(["examples/research-summary/main.roc", "--no-cache"], temporary, [])?
+					validate_artifact!(Path.join(temporary, output_name), kind)?
+					Script.pass!("research bibliography from the suite root")?
+				}
 			}
 			Ok({})
 		},
