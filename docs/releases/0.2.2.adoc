@@ -1,0 +1,6 @@
+= roc-pandoc 0.2.2
+
+The research-summary example resolves its bibliography from both its own
+directory and the examples archive root used by the shared nightly runner.
+The package API is unchanged. This release uses the repository's enabled
+immutable-release setting.
