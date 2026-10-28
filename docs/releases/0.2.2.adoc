@@ -4,3 +4,12 @@ The research-summary example resolves its bibliography from both its own
 directory and the examples archive root used by the shared nightly runner.
 The package API is unchanged. This release uses the repository's enabled
 immutable-release setting.
+
+== Use this release
+
+[source,roc]
+----
+app [main!] {
+    pandoc: "{package-url}",
+}
+----
