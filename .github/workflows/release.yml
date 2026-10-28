@@ -27,7 +27,7 @@ jobs:
       contents: write
       id-token: write
       attestations: write
-    uses: lukewilliamboswell/roc-automation/.github/workflows/release-package.yml@9b5c724e84d53fc427a0017142cf94ebe729e09f
+    uses: lukewilliamboswell/roc-automation/.github/workflows/release-package.yml@a25b5129340b9b2ad1744d20330b8ee4d38a1849
     with:
       version: ${{ inputs.version || '' }}
       nightly-tag: ${{ inputs.nightly-tag || '' }}
