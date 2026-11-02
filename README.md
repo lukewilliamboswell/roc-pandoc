@@ -89,24 +89,7 @@ The hello-world example prints Pandoc JSON. The CSV reading-list and Markdown ex
 
 ## Development
 
-Install Blueprint 0.8.0, Pandoc, unzip, and the latest Roc nightly, then run:
-
-```sh
-blueprint check
-blueprint run check
-blueprint run goldens -- --update
-blueprint run release-package -- test-examples
-```
-
-Blueprint locks the tooling compiler separately; the package compiler is the host's latest nightly. The shared release workflow builds and tests the exact bundle and examples archive before publication. Repository examples follow the working tree; archived examples name the immutable release bundle.
-
-Generate the public API reference for both exposed modules with the package root:
-
-```sh
-roc docs package/main.roc
-```
-
-The generated site is written to `generated-docs` by default. Add `--serve` to browse it locally.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, checks and documentation work.
 
 ## License
 
