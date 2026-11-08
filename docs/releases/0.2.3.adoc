@@ -1,0 +1,15 @@
+= roc-pandoc 0.2.3
+
+The published examples use basic-cli 0.27.0 and work with Roc
+`nightly-2026-11-07-ad3a5d2`. This restores document generation after the
+compiler changed interpolation and stream size hints. The package API and
+generated Pandoc JSON are unchanged.
+
+== Use this release
+
+[source,roc]
+----
+app [main!] {
+    pandoc: "{package-url}",
+}
+----
