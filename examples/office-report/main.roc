@@ -1,7 +1,7 @@
 ## Generate an editable Word report (use --reference-doc=brand.docx to apply a house style):
 ## cd examples/office-report && roc main.roc
 app [main!] {
-	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.26.0/GddgvsGjiNXrHFW6au5i5dUDbTs8FinQdrgE2Gqmw53t.tar.zst",
+	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.27.0/9yjxqdGTP4xSpSEmDazwTmRsehfRZzA19pwEKkR6fj1g.tar.zst",
 	pandoc: "../../package/main.roc",
 }
 

@@ -11,7 +11,7 @@
 # roc-automation workflow that .github/workflows/release.yml calls; it runs the
 # `check` task here. `pandoc` is expected on PATH for the golden tests and the
 # directory examples.
-app [config] { pf: platform "https://github.com/lukewilliamboswell/roc-blueprint/releases/download/0.8.0/FbJymjYdCxx9vqMcau7r4tQfeAbnVGqqJoYrLGqPCqKu.tar.zst" }
+app [config] { pf: platform "https://github.com/lukewilliamboswell/roc-blueprint/releases/download/0.12.0/GSb71LxYHqLohZz8jMfawWEwQcyev9ZdVC26sfsDwfq8.tar.zst" }
 
 import pf.Recipes
 
@@ -28,7 +28,7 @@ config = [
 	),
 	# The shared release workflow runs this utility against the `roc` on PATH; a
 	# maintainer runs the same task locally, such as `-- test-examples --update`.
-	Environment("release", [Programs([Fetch("release-package", Recipes.file("https://github.com/lukewilliamboswell/roc-automation/releases/download/tools-0.9.0/release-package-{system}"))]), Expect(["roc", "git", "gh", "pandoc", "tar", "unzip", "zip", "chmod", "touch", "env"])]),
+	Environment("release", [Programs([Fetch("release-package", Recipes.file("https://github.com/lukewilliamboswell/roc-automation/releases/download/tools-0.10.1/release-package-{system}"))]), Expect(["roc", "git", "gh", "pandoc", "tar", "unzip", "zip", "chmod", "touch", "env"])]),
 	Shell("default", [Use("dev")]),
 	# Everything checked before the release workflow packages anything.
 	Task("check", [Use("dev"), Run(["scripts/check_all.roc"])]),
