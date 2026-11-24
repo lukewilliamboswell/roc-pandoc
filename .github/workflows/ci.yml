@@ -15,5 +15,5 @@ jobs:
           persist-credentials: false
       - uses: lukewilliamboswell/roc-automation/actions/setup-blueprint@acc5efdcd929b38e665cd3ae6e694d1c4887f9c7
       - uses: lukewilliamboswell/roc-automation/actions/setup-roc-nightly@acc5efdcd929b38e665cd3ae6e694d1c4887f9c7
-      - run: sudo apt-get update && sudo apt-get install --yes pandoc
+      - run: sudo apt-get install --yes pandoc
       - run: blueprint run check
