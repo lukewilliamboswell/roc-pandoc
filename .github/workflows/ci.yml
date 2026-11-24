@@ -13,10 +13,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-      - uses: lukewilliamboswell/roc-automation/actions/setup-blueprint@e12512e2605608588782edb044dd766137e34869
-      - uses: roc-lang/setup-roc@30af91a173612e462a5df47f3b697c53c211f48c
-        with:
-          version: nightly
-          download-method: asset-api
+      - uses: lukewilliamboswell/roc-automation/actions/setup-blueprint@acc5efdcd929b38e665cd3ae6e694d1c4887f9c7
+      - uses: lukewilliamboswell/roc-automation/actions/setup-roc-nightly@acc5efdcd929b38e665cd3ae6e694d1c4887f9c7
       - run: sudo apt-get update && sudo apt-get install --yes pandoc
       - run: blueprint run check

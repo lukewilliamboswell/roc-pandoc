@@ -1,12 +1,11 @@
 app [main!] {
-	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.27.0/9yjxqdGTP4xSpSEmDazwTmRsehfRZzA19pwEKkR6fj1g.tar.zst",
+	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.28.1/7brgwR8YUqfeGrkdfF1V4GPPN7DnP7ftqub9KcrTEZtr.tar.zst",
 	pandoc: "../package/main.roc",
-	parser: "https://github.com/lukewilliamboswell/roc-parser/releases/download/1.2.0/GzeZxk7V7GHFa42qhgzd8gUgX6cEyY3NmrwmDfsuskNd.tar.zst",
+	parser: "https://github.com/lukewilliamboswell/roc-parser/releases/download/6.0.0-rc.3.1/BBUDV8ak5oBCYRjWbQ3zNDBjXFVZydTdMPswovVkMUsT.tar.zst",
 }
 
 import pandoc.Pandoc
 import parser.Markdown
-import parser.String
 import cli.OsStr
 import Render
 
@@ -23,17 +22,10 @@ source =
 main! : List(OsStr) => Try({}, _)
 main! = |args| {
 	markdown_input = args.keep_if(|arg| OsStr.display(arg) != "--open").get(0).map_ok(OsStr.display) ?? source
-	document =
-		match String.parse_str(Markdown.all, markdown_input) {
-			Ok(nodes) => Pandoc.Document.{
-				meta: Dict.empty() |> Dict.insert("title", Pandoc.MetaValue.String("Roc release notes")),
-				blocks: nodes.map(markdown_block),
-			}
-			Err(_) => Pandoc.Document.{
-				meta: Dict.empty(),
-				blocks: [Pandoc.Block.Para([Pandoc.Inline.String("Could not parse the Markdown input.")])],
-			}
-		}
+	document = Pandoc.Document.{
+		meta: Dict.empty() |> Dict.insert("title", Pandoc.MetaValue.String("Roc release notes")),
+		blocks: Markdown.parse_str(markdown_input).map(markdown_block),
+	}
 
 	Render.html_and_open!("roc-release-notes", Json.to_str(document), args.any(|arg| OsStr.display(arg) == "--open"))?
 	Ok({})
@@ -56,8 +48,7 @@ markdown_block = |node| match node {
 	Table(_) => Pandoc.Block.Para([Pandoc.Inline.String("[table]")])
 	ThematicBreak => Pandoc.Block.Plain([Pandoc.Inline.String("---")])
 	HtmlBlock(raw) => Pandoc.Block.CodeBlock(Pandoc.Attr.{ identifier: "", classes: ["html"], attributes: [] }, raw)
-	Frontmatter({ raw }) => Pandoc.Block.CodeBlock(Pandoc.Attr.{ identifier: "", classes: ["yaml"], attributes: [] }, raw)
-	TODO(line) => Pandoc.Block.Para([Pandoc.Inline.String(line)])
+	Frontmatter(raw) => Pandoc.Block.CodeBlock(Pandoc.Attr.{ identifier: "", classes: ["yaml"], attributes: [] }, raw)
 }
 
 block_text : Markdown.Markdown -> List(Pandoc.Inline)
