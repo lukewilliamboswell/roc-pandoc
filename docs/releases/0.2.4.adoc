@@ -1,0 +1,16 @@
+= roc-pandoc 0.2.4
+
+The published examples use basic-cli 0.28.1 to support the current Roc
+entrypoint types. The Markdown example also uses the current roc-parser
+Markdown API. The Pandoc package API is unchanged.
+
+The examples build without warnings on Roc `nightly-2026-11-23-b5c77fc`.
+
+== Use this release
+
+[source,roc]
+----
+app [main!] {
+    pandoc: "{package-url}",
+}
+----
