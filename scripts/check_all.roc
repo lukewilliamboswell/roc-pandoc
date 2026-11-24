@@ -1,14 +1,14 @@
 #!/usr/bin/env roc-stable
 app [main!] {
-	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.23.0-rc1/3hT3SoHZ6qbEsa9qVFLUW3547U5LeoNd1KbpqLpz4r1i.tar.zst",
-	ascii: "https://github.com/Hasnep/roc-ascii/releases/download/v0.5.0/5WxqRf15XVko4HxVq5dW8r84s95CxrtvzrjZYwbg9Z3H.tar.zst",
 	ansi: "https://github.com/lukewilliamboswell/roc-ansi/releases/download/0.13.0/JXLM47L6CzrLXB5HBfqc27VnU6CD4jMm5Mk6dgbbovL.tar.zst",
-	roc: "nightly-2026-09-10-a670e34",
+	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.28.1/7brgwR8YUqfeGrkdfF1V4GPPN7DnP7ftqub9KcrTEZtr.tar.zst",
+	roc: "nightly-2026-11-23-b5c77fc",
 }
 
 import cli.Cmd
 import cli.Env
 import cli.Path
+import cli.System
 import src/Files
 import src/Script
 
@@ -134,9 +134,9 @@ validate_artifact! = |path, kind| {
 	}
 	match kind {
 		Zip => {
-			match Env.platform!().os {
-				LINUX | MACOS => {}
-				WINDOWS | OTHER(_) => return Err(ZipValidationRequiresUnix)
+			match System.target!().os() {
+				Linux(_) | MacOS(_) => {}
+				Windows(_) => return Err(ZipValidationRequiresUnix)
 			}
 			if !Cmd.check_available!("unzip") {
 				return Err(UnzipUnavailable)
@@ -145,11 +145,11 @@ validate_artifact! = |path, kind| {
 		}
 		Html(title) => {
 			content = Path.read_utf8!(path)?
-			if content.contains("<title>${title}</title>") Ok({}) else Err(UnexpectedHtmlTitle(Path.display(path)))
+			if (content.contains("<title>${title}</title>")) Ok({}) else Err(UnexpectedHtmlTitle(Path.display(path)))
 		}
 		Latex => {
 			content = Path.read_utf8!(path)?
-			if content.contains("\\begin{document}") and content.contains("\\end{document}") Ok({}) else Err(InvalidLatex(Path.display(path)))
+			if (content.contains("\\begin{document}") and content.contains("\\end{document}")) Ok({}) else Err(InvalidLatex(Path.display(path)))
 		}
 	}
 }

@@ -21,7 +21,7 @@ config = [
 	Environment(
 		"dev",
 		[
-			Programs([Fetch("roc-stable", Recipes.roc_nightly("nightly-2026-09-10-a670e34"))]),
+			Programs([Fetch("roc-stable", Recipes.roc_nightly("nightly-2026-11-23-b5c77fc"))]),
 			# Programs the scripts start.
 			Expect(["git", "pandoc", "roc", "unzip"]),
 		],

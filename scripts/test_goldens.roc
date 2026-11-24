@@ -1,10 +1,9 @@
 #!/usr/bin/env roc-stable
 app [main!] {
-	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.23.0-rc1/3hT3SoHZ6qbEsa9qVFLUW3547U5LeoNd1KbpqLpz4r1i.tar.zst",
-	ascii: "https://github.com/Hasnep/roc-ascii/releases/download/v0.5.0/5WxqRf15XVko4HxVq5dW8r84s95CxrtvzrjZYwbg9Z3H.tar.zst",
 	ansi: "https://github.com/lukewilliamboswell/roc-ansi/releases/download/0.13.0/JXLM47L6CzrLXB5HBfqc27VnU6CD4jMm5Mk6dgbbovL.tar.zst",
+	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.28.1/7brgwR8YUqfeGrkdfF1V4GPPN7DnP7ftqub9KcrTEZtr.tar.zst",
+	roc: "nightly-2026-11-23-b5c77fc",
 	weaver: "https://github.com/lukewilliamboswell/weaver/releases/download/0.9.0/7j6KBFBEZ8pNMLQHkx9xiwyZ2PmwQPgKNDPUih6gKe77.tar.zst",
-	roc: "nightly-2026-09-10-a670e34",
 }
 
 import cli.Cmd
@@ -71,7 +70,7 @@ run_cases! = |remaining, jobs, roc_nightly, pandoc_available, update| {
 	if remaining.len() == 0 {
 		return Ok({})
 	}
-	batch_size = if jobs == 0 or jobs > remaining.len() remaining.len() else jobs
+	batch_size = if (jobs == 0 or jobs > remaining.len()) remaining.len() else jobs
 	# Start one batch together before waiting, which provides bounded parallelism
 	# without hiding process ownership in a separate scheduler.
 	batch = List.sublist(remaining, { start: 0, len: batch_size })
