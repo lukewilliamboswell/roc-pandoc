@@ -34,5 +34,5 @@ config = [
 	Task("check", [Use("dev"), Run(["scripts/check_all.roc"])]),
 	Task("release-package", [Use("release"), Run(["release-package"])]),
 	# The golden tests of tests/cases against tests/goldens.
-	Task("goldens", [Use("dev"), Run(["scripts/test_goldens.roc", "--"])]),
+	Task("goldens", [Use("dev"), Run(["scripts/test_goldens.roc"])]),
 ]

@@ -20,7 +20,7 @@ main! = |args| {
 	# This stable-Roc driver runs each small test application with ROC_NIGHTLY and
 	# compares its JSON output with tests/goldens. --update reverses the last step
 	# and intentionally replaces the checked-in expected output.
-	options = match Cli.parse_or_display_message(cli_parser, args.drop_first(1), OsStr.to_raw) {
+	options = match Cli.parse_or_display_message(cli_parser, args, OsStr.to_raw) {
 		Ok(parsed) => {
 			jobs = match parsed.jobs {
 				Ok(value) if value > 0 => value

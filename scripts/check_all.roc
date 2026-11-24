@@ -7,6 +7,7 @@ app [main!] {
 
 import cli.Cmd
 import cli.Env
+import cli.OsStr
 import cli.Path
 import cli.System
 import src/Files
@@ -66,7 +67,7 @@ check_script_tooling! = |roc_stable| {
 test_goldens! = |roc_stable| {
 	# The driver itself uses stable Roc; it obtains ROC_NIGHTLY from the environment
 	# and uses that compiler for every golden test application.
-	roc_stable.run!(["scripts/test_goldens.roc", "--", "--require-pandoc"])
+	roc_stable.run!(["scripts/test_goldens.roc", "--require-pandoc"])
 }
 
 check_package! = |roc_nightly| {
@@ -92,7 +93,7 @@ test_generated_artifacts! = |roc_nightly|
 			Path.copy_dir!("examples", Path.join(temporary, "examples"))?
 			for (workflow, output_name, kind) in generated_examples {
 				workdir = Path.join(Path.join(temporary, "examples"), workflow)
-				_ = roc_nightly.capture!(["main.roc", "--no-cache"], workdir, [])?
+				run_example!(roc_nightly, "main.roc", workdir)?
 				artifact = Path.join(workdir, output_name)
 				validate_artifact!(artifact, kind)?
 				json_path = Path.join(workdir, "${output_name}.pandoc.json")
@@ -106,7 +107,7 @@ test_generated_artifacts! = |roc_nightly|
 				Script.pass!("examples/${workflow}/${output_name}")?
 				if workflow == "research-summary" {
 					# The shared nightly executes native apps from the archive root.
-					_ = roc_nightly.capture!(["examples/research-summary/main.roc", "--no-cache"], temporary, [])?
+					run_example!(roc_nightly, "examples/research-summary/main.roc", temporary)?
 					validate_artifact!(Path.join(temporary, output_name), kind)?
 					Script.pass!("research bibliography from the suite root")?
 				}
@@ -114,6 +115,15 @@ test_generated_artifacts! = |roc_nightly|
 			Ok({})
 		},
 	)
+
+# An explicit command error type keeps the temporary-directory callback's
+# error adaptation stable on the pinned compiler.
+run_example! : Script.Command, Str, Path => Try({}, [ExampleCommandFailed(Str)])
+run_example! = |roc_nightly, source, workdir|
+	match roc_nightly.cmd([OsStr.from_str(source), "--no-cache"]).cwd(workdir).call!() {
+		Ok({}) => Ok({})
+		Err(err) => Err(ExampleCommandFailed("${Path.display(workdir)}/${source}: ${Str.inspect(err)}"))
+	}
 
 check_documentation! = |roc_nightly|
 	Env.with_temp_dir!(|output| roc_nightly.run!(["docs", "package/main.roc", "--output=${Path.display(output)}", "--no-cache"]))

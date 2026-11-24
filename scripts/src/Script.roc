@@ -33,10 +33,6 @@ Script := [].{
 			}
 		}
 
-		## Run in `cwd` with byte input and return captured standard output.
-		capture! = |self, args, cwd, stdin|
-			run_capture!(self.base, args, cwd, stdin)
-
 		## Spawn in `cwd` with standard output and error captured for later waiting.
 		spawn! = |self, args, cwd|
 			spawn_capture!(self.base, args, cwd)
