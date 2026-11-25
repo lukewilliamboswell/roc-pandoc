@@ -11,7 +11,7 @@
 # roc-automation workflow that .github/workflows/release.yml calls; it runs the
 # `check` task here. `pandoc` is expected on PATH for the golden tests and the
 # directory examples.
-app [config] { pf: platform "https://github.com/lukewilliamboswell/roc-blueprint/releases/download/0.12.0/GSb71LxYHqLohZz8jMfawWEwQcyev9ZdVC26sfsDwfq8.tar.zst" }
+app [config] { pf: platform "https://github.com/lukewilliamboswell/roc-blueprint/releases/download/0.15.0-rc.1/FwWWY6PczB7QsUoWKgaLTuBGGajLjfA4MhaLD36sJxrN.tar.zst" }
 
 import pf.Recipes
 
@@ -21,7 +21,7 @@ config = [
 	Environment(
 		"dev",
 		[
-			Programs([Fetch("roc-stable", Recipes.roc_nightly("nightly-2026-09-10-a670e34"))]),
+			Programs([Fetch("roc-stable", Recipes.roc_nightly("nightly-2026-11-25-d5a4f1e"))]),
 			# Programs the scripts start.
 			Expect(["git", "pandoc", "roc", "unzip"]),
 		],
@@ -34,5 +34,5 @@ config = [
 	Task("check", [Use("dev"), Run(["scripts/check_all.roc"])]),
 	Task("release-package", [Use("release"), Run(["release-package"])]),
 	# The golden tests of tests/cases against tests/goldens.
-	Task("goldens", [Use("dev"), Run(["scripts/test_goldens.roc", "--"])]),
+	Task("goldens", [Use("dev"), Run(["scripts/test_goldens.roc"])]),
 ]

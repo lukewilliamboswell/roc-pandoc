@@ -1,14 +1,15 @@
 #!/usr/bin/env roc-stable
 app [main!] {
-	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.23.0-rc1/3hT3SoHZ6qbEsa9qVFLUW3547U5LeoNd1KbpqLpz4r1i.tar.zst",
-	ascii: "https://github.com/Hasnep/roc-ascii/releases/download/v0.5.0/5WxqRf15XVko4HxVq5dW8r84s95CxrtvzrjZYwbg9Z3H.tar.zst",
 	ansi: "https://github.com/lukewilliamboswell/roc-ansi/releases/download/0.13.0/JXLM47L6CzrLXB5HBfqc27VnU6CD4jMm5Mk6dgbbovL.tar.zst",
-	roc: "nightly-2026-09-10-a670e34",
+	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.28.1/7brgwR8YUqfeGrkdfF1V4GPPN7DnP7ftqub9KcrTEZtr.tar.zst",
+	roc: "nightly-2026-11-25-d5a4f1e",
 }
 
 import cli.Cmd
 import cli.Env
+import cli.OsStr
 import cli.Path
+import cli.System
 import src/Files
 import src/Script
 
@@ -66,18 +67,18 @@ check_script_tooling! = |roc_stable| {
 test_goldens! = |roc_stable| {
 	# The driver itself uses stable Roc; it obtains ROC_NIGHTLY from the environment
 	# and uses that compiler for every golden test application.
-	roc_stable.run!(["scripts/test_goldens.roc", "--", "--require-pandoc"])
+	roc_stable.run!(["scripts/test_goldens.roc", "--require-pandoc"])
 }
 
 check_package! = |roc_nightly| {
 	roc_nightly.run!(["fmt", "--check", "package", "examples", "tests/cases"])?
-	roc_nightly.run!(["check", "package/main.roc", "--no-cache"])
+	roc_nightly.run!(["check", "package/main.roc"])
 }
 
 check_example_apps! = |roc_nightly| {
 	examples = Files.app_roots!("examples")?
 	for example in examples {
-		roc_nightly.run!(["check", Path.to_os_str(example), "--no-cache"])?
+		roc_nightly.run!(["check", Path.to_os_str(example)])?
 		Script.pass!(Path.display(example))?
 	}
 	Ok({})
@@ -92,7 +93,7 @@ test_generated_artifacts! = |roc_nightly|
 			Path.copy_dir!("examples", Path.join(temporary, "examples"))?
 			for (workflow, output_name, kind) in generated_examples {
 				workdir = Path.join(Path.join(temporary, "examples"), workflow)
-				_ = roc_nightly.capture!(["main.roc", "--no-cache"], workdir, [])?
+				run_example!(roc_nightly, "main.roc", workdir)?
 				artifact = Path.join(workdir, output_name)
 				validate_artifact!(artifact, kind)?
 				json_path = Path.join(workdir, "${output_name}.pandoc.json")
@@ -106,7 +107,7 @@ test_generated_artifacts! = |roc_nightly|
 				Script.pass!("examples/${workflow}/${output_name}")?
 				if workflow == "research-summary" {
 					# The shared nightly executes native apps from the archive root.
-					_ = roc_nightly.capture!(["examples/research-summary/main.roc", "--no-cache"], temporary, [])?
+					run_example!(roc_nightly, "examples/research-summary/main.roc", temporary)?
 					validate_artifact!(Path.join(temporary, output_name), kind)?
 					Script.pass!("research bibliography from the suite root")?
 				}
@@ -115,8 +116,17 @@ test_generated_artifacts! = |roc_nightly|
 		},
 	)
 
+# An explicit command error type keeps the temporary-directory callback's
+# error adaptation stable on the pinned compiler.
+run_example! : Script.Command, Str, Path => Try({}, [ExampleCommandFailed(Str)])
+run_example! = |roc_nightly, source, workdir|
+	match roc_nightly.cmd([OsStr.from_str(source)]).cwd(workdir).call!() {
+		Ok({}) => Ok({})
+		Err(err) => Err(ExampleCommandFailed("${Path.display(workdir)}/${source}: ${Str.inspect(err)}"))
+	}
+
 check_documentation! = |roc_nightly|
-	Env.with_temp_dir!(|output| roc_nightly.run!(["docs", "package/main.roc", "--output=${Path.display(output)}", "--no-cache"]))
+	Env.with_temp_dir!(|output| roc_nightly.run!(["docs", "package/main.roc", "--output=${Path.display(output)}"]))
 
 generated_examples = [
 	("ebook", "field-notes.epub", Zip),
@@ -134,9 +144,9 @@ validate_artifact! = |path, kind| {
 	}
 	match kind {
 		Zip => {
-			match Env.platform!().os {
-				LINUX | MACOS => {}
-				WINDOWS | OTHER(_) => return Err(ZipValidationRequiresUnix)
+			match System.target!().os() {
+				Linux(_) | MacOS(_) => {}
+				Windows(_) => return Err(ZipValidationRequiresUnix)
 			}
 			if !Cmd.check_available!("unzip") {
 				return Err(UnzipUnavailable)
@@ -145,11 +155,11 @@ validate_artifact! = |path, kind| {
 		}
 		Html(title) => {
 			content = Path.read_utf8!(path)?
-			if content.contains("<title>${title}</title>") Ok({}) else Err(UnexpectedHtmlTitle(Path.display(path)))
+			if (content.contains("<title>${title}</title>")) Ok({}) else Err(UnexpectedHtmlTitle(Path.display(path)))
 		}
 		Latex => {
 			content = Path.read_utf8!(path)?
-			if content.contains("\\begin{document}") and content.contains("\\end{document}") Ok({}) else Err(InvalidLatex(Path.display(path)))
+			if (content.contains("\\begin{document}") and content.contains("\\end{document}")) Ok({}) else Err(InvalidLatex(Path.display(path)))
 		}
 	}
 }

@@ -1,5 +1,4 @@
-import cli.Path exposing [Path]
-import ascii.Ascii
+import cli.Path
 
 ## Deterministic filesystem discovery helpers for repository automation.
 Files := [].{
@@ -30,17 +29,22 @@ Files := [].{
 	sort_paths : List(Path) -> Try(List(Path), _)
 	sort_paths = |paths| {
 		keyed = paths.map_try(
-			|path|
-				Ascii.from_str(Path.display(path))
-					.map_ok(|key| (key, path))
-					.map_err(|_| NonAsciiRepositoryPath(Path.display(path))),
+			|path| {
+				display = Path.display(path)
+				bytes = Str.to_utf8(display)
+				if (bytes.all(|byte| byte < 128)) Ok((bytes, path)) else Err(NonAsciiRepositoryPath(display))
+			},
 		)?
-		Ok(
-			List.sort_with(keyed, |(left, _), (right, _)| Ascii.order_relative_to(left, right))
-				|> List.map(|(_, path)| path),
-		)
+		Ok(List.sort_with(keyed, |(left, _), (right, _)| compare_bytes(left, right)).map(|(_, path)| path))
 	}
 }
+
+compare_bytes = |left, right|
+	match (left, right) {
+		([a, .. as rest_left], [b, .. as rest_right]) if a == b => compare_bytes(rest_left, rest_right)
+		([a, ..], [b, ..]) => a.order_relative_to(b)
+		_ => left.len().order_relative_to(right.len())
+	}
 
 find_apps! = |entries, found|
 	match entries {
@@ -49,7 +53,7 @@ find_apps! = |entries, found|
 				IsDir => find_apps!(rest, found.concat(Files.app_sources!(path)?))
 				IsFile if Path.ext(path).map_ok(Path.display) == Ok("roc") => {
 					source = Path.read_utf8!(path)?
-					find_apps!(rest, if source.contains("app ") found.append({ path, source }) else found)
+					find_apps!(rest, if (source.contains("app ")) found.append({ path, source }) else found)
 				}
 				_ => find_apps!(rest, found)
 			}

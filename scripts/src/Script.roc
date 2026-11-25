@@ -11,16 +11,16 @@ import ansi.ANSI
 Script := [].{
 
 	## A command-line program with receiver methods used by repository scripts.
-	Command := { base : Cmd, program : OsStr }.{
+	Command := { base : Cmd.Command, program : OsStr }.{
 
 		## Print a concise `RUN` heading, append arguments, and execute the command.
 		run! : Command, List(OsStr) => Try({}, _)
 		run! = |self, args| {
-			command = self.base.args(args)
+			invocation = self.base.args(args)
 			display = Str.join_with([self.program].concat(args).map(OsStr.display), " ")
 			Stdout.line!("\n${heading("RUN", Cyan)} ${display}")?
 			if args.first().map_ok(OsStr.display) == Ok("check") {
-				output = command.run!().map_err(|err| CommandRunFailed(err))?
+				output = invocation.run!().map_err(|err| CommandRunFailed(err))?
 				Stdout.write_bytes!(output.stdout_bytes)?
 				Stderr.write_bytes!(output.stderr_bytes)?
 				match output.status {
@@ -29,20 +29,16 @@ Script := [].{
 					Signaled(signal) => Err(CommandSignaled(signal))
 				}
 			} else {
-				command.exec_cmd!()
+				invocation.call!()
 			}
 		}
-
-		## Run in `cwd` with byte input and return captured standard output.
-		capture! = |self, args, cwd, stdin|
-			run_capture!(self.base, args, cwd, stdin)
 
 		## Spawn in `cwd` with standard output and error captured for later waiting.
 		spawn! = |self, args, cwd|
 			spawn_capture!(self.base, args, cwd)
 
 		## Build the underlying basic-cli command with the supplied arguments.
-		cmd : Command, List(OsStr) -> Cmd
+		cmd : Command, List(OsStr) -> Cmd.Command
 		cmd = |self, args| self.base.args(args)
 	}
 
