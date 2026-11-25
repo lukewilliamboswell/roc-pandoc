@@ -2,7 +2,7 @@
 app [main!] {
 	ansi: "https://github.com/lukewilliamboswell/roc-ansi/releases/download/0.13.0/JXLM47L6CzrLXB5HBfqc27VnU6CD4jMm5Mk6dgbbovL.tar.zst",
 	cli: platform "https://github.com/roc-lang/basic-cli/releases/download/0.28.1/7brgwR8YUqfeGrkdfF1V4GPPN7DnP7ftqub9KcrTEZtr.tar.zst",
-	roc: "nightly-2026-11-24-ff5e544",
+	roc: "nightly-2026-11-25-d5a4f1e",
 }
 
 import cli.Cmd
@@ -72,13 +72,13 @@ test_goldens! = |roc_stable| {
 
 check_package! = |roc_nightly| {
 	roc_nightly.run!(["fmt", "--check", "package", "examples", "tests/cases"])?
-	roc_nightly.run!(["check", "package/main.roc", "--no-cache"])
+	roc_nightly.run!(["check", "package/main.roc"])
 }
 
 check_example_apps! = |roc_nightly| {
 	examples = Files.app_roots!("examples")?
 	for example in examples {
-		roc_nightly.run!(["check", Path.to_os_str(example), "--no-cache"])?
+		roc_nightly.run!(["check", Path.to_os_str(example)])?
 		Script.pass!(Path.display(example))?
 	}
 	Ok({})
@@ -120,13 +120,13 @@ test_generated_artifacts! = |roc_nightly|
 # error adaptation stable on the pinned compiler.
 run_example! : Script.Command, Str, Path => Try({}, [ExampleCommandFailed(Str)])
 run_example! = |roc_nightly, source, workdir|
-	match roc_nightly.cmd([OsStr.from_str(source), "--no-cache"]).cwd(workdir).call!() {
+	match roc_nightly.cmd([OsStr.from_str(source)]).cwd(workdir).call!() {
 		Ok({}) => Ok({})
 		Err(err) => Err(ExampleCommandFailed("${Path.display(workdir)}/${source}: ${Str.inspect(err)}"))
 	}
 
 check_documentation! = |roc_nightly|
-	Env.with_temp_dir!(|output| roc_nightly.run!(["docs", "package/main.roc", "--output=${Path.display(output)}", "--no-cache"]))
+	Env.with_temp_dir!(|output| roc_nightly.run!(["docs", "package/main.roc", "--output=${Path.display(output)}"]))
 
 generated_examples = [
 	("ebook", "field-notes.epub", Zip),
