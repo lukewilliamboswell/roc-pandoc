@@ -11,7 +11,7 @@
 # roc-automation workflow that .github/workflows/release.yml calls; it runs the
 # `check` task here. `pandoc` is expected on PATH for the golden tests and the
 # directory examples.
-app [config] { pf: platform "https://github.com/lukewilliamboswell/roc-blueprint/releases/download/0.12.0/GSb71LxYHqLohZz8jMfawWEwQcyev9ZdVC26sfsDwfq8.tar.zst" }
+app [config] { pf: platform "https://github.com/lukewilliamboswell/roc-blueprint/releases/download/0.15.0-rc.1/FwWWY6PczB7QsUoWKgaLTuBGGajLjfA4MhaLD36sJxrN.tar.zst" }
 
 import pf.Recipes
 
